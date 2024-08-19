@@ -1,0 +1,74 @@
+.scores-container {
+  display: flex;
+  flex-wrap: nowrap; /* Prevent wrapping */
+  justify-content: center; /* Center the content horizontally */
+  align-items: center; /* Center the items vertically */
+  overflow-x: auto; /* Allow horizontal scrolling if needed */
+  padding: 10px; /* Maintain consistent padding */
+  background-color: rgba(10, 10, 10, 0.85);
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+  margin: 20px auto;
+  font-family: 'Arial', sans-serif;
+  color: #ffffff;
+  backdrop-filter: blur(5px);
+  background-image: url('../../../public/background-wood-with-scratches.jpg');
+  max-height: 10vh; /* Cap the height at 15% of the viewport height */
+}
+
+.player-score {
+  flex: 0 0 15%; /* Base width of each score card */
+  margin: 5px; /* Add margin to create space around the player scores */
+  padding: 5px; /* Consistent padding */
+  background: linear-gradient(145deg, #444, #222);
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s ease-in-out, width 0.2s ease-in-out;
+  min-width: 70px; /* Ensure minimum readability */
+  max-width: 150px; /* Ensure maximum readability */
+}
+
+.player-score:hover {
+  transform: translateY(-3px);
+}
+
+.player-name {
+  font-weight: bold;
+  margin-bottom: 3px;
+  font-size: 1rem; /* Set a responsive base font size */
+  text-align: center;
+}
+
+.blitz-cards {
+  font-style: italic;
+  font-size: 0.8rem; /* Set a responsive base font size */
+  text-align: center;
+}
+
+.green {
+  color: #4CAF50;
+}
+
+.orange {
+  color: #FFA726;
+}
+
+.red {
+  color: #EF5350;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .player-score {
+    flex: 0 0 20%; /* Increase relative width for smaller screens */
+    min-width: 50px; /* Further reduce minimum width */
+    max-width: none; /* Remove maximum width restriction */
+  }
+
+  .player-name, .blitz-cards {
+    font-size: 0.8rem; /* Adjust font size for smaller screens */
+  }
+}

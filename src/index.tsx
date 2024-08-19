@@ -4,16 +4,23 @@ import './index.css';
 import App from './components/App';
 import reportWebVitals from './reportWebVitals';
 import * as serviceWorker from './serviceWorker';
+import Firebase, { FirebaseContext } from './components/Firebase';
+import {GlobalStateProvider} from "./components/Firebase/GlobalUser";
 
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+const rootElement = document.getElementById('root');
+if (rootElement) {
+    const root = ReactDOM.createRoot(rootElement);
+    root.render(
+     <FirebaseContext.Provider value={new Firebase() as any}>
+        <GlobalStateProvider>
+            <React.StrictMode>
+                <App />
+            </React.StrictMode>
+        </GlobalStateProvider>
+     </FirebaseContext.Provider>
+);}
+
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

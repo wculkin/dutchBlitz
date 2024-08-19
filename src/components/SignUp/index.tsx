@@ -1,9 +1,4 @@
-import React from 'react';
 
-const SignUp = () => (
-  <div>
-    <h1>SignUp</h1>
-  </div>
-);
+import SignUpPage from "./SignUpPage";
 
-export default SignUp;
+export default SignUpPage;

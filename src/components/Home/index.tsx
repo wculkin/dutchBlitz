@@ -1,9 +1,14 @@
 import React from 'react';
 
-const Home = () => (
-  <div>
-    <h1>Home</h1>
-  </div>
-);
+
+const Home = () => {
+
+return (<div>
+    <div className="games-list">
+
+    </div>
+
+</div>)
+}
 
 export default Home;

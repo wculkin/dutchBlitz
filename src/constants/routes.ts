@@ -5,3 +5,7 @@ export const HOME = '/home';
 export const ACCOUNT = '/account';
 export const ADMIN = '/admin';
 export const PASSWORD_FORGET = '/pw-forget';
+export const GAME_WITH_KEY = '/game/:keys'
+export const GAME_REALTIME_WITH_KEY = '/gameStates/:keys'
+export const GAME_WITH_COMPUTERS_REALTIME_WITH_KEY = '/computer/gameStates/:keys'
+export const WAITING_ROOM_KEY = '/waitingRoom/:keys';

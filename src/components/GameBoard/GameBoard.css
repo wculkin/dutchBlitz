@@ -1,0 +1,64 @@
+.gameboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 20px;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  background-color: #f4e9e2;
+  background-image: url('../../../public/background-wood-with-scratches.jpg');
+  background-size: cover;
+  background-position: center;
+  max-height: 40vh; /* Set maximum height to 60% of viewport height */
+  min-height: 30vh; /* Set minimum height to 50% of viewport height */
+
+  overflow-y: auto; /* Enable scrolling if content overflows */
+}
+
+.gameboard-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.tile {
+  width: 80px; /* Reduced width */
+  height: 120px; /* Reduced height */
+  background-color: rgba(255, 255, 255, 0.8);
+  margin: 5px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #333;
+  transition: all 0.3s;
+}
+
+.tile:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.tile.active {
+  background-color: #007BFF;
+  color: #ffffff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .gameboard {
+    padding: 10px;
+    margin: 10px;
+  }
+
+  .tile {
+    width: 60px; /* Further reduced width for smaller screens */
+    height: 90px; /* Further reduced height for smaller screens */
+  }
+}

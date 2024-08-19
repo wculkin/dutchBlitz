@@ -1,0 +1,63 @@
+/* Ensure the main container fills the viewport height */
+.main-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Style for flexible content area */
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Prevents overflow */
+}
+
+/* Flex layout for the gameboard and other components */
+.flex-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+}
+
+/* Gameboard dynamic sizing */
+.gameboard {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: auto;
+  margin: 10px;
+}
+
+/* Dynamic tile sizing */
+.tile {
+  width: 10vw; /* Adjusts based on viewport width */
+  height: 15vw; /* Maintains aspect ratio */
+  max-width: 100px; /* Ensures maximum size */
+  max-height: 150px; /* Ensures maximum size */
+  margin: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+  .tile {
+    width: 8vw;
+    height: 12vw;
+    max-width: 80px;
+    max-height: 120px;
+  }
+
+  .gameboard {
+    margin: 5px;
+  }
+}
