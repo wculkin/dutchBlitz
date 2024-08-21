@@ -84,25 +84,11 @@ const GameTime: React.FC = () => {
                 }
                 const encodedPlayerName = encodeKey(playerName as string);
                 setScores(gameState.scores);
-                setIsOver(false);
+                setIsOver(gameState.isOver);
                 const deck = gameState.decks[encodedPlayerName];
                 if(isDeckDifferent(deck)){
                     setPlayerHand(deck)
                 }
-                // if (postPile.length === 0 && !isOver) {
-                //     setPlayerHand(deck);
-                // } else {
-                //     if (deck.blitzPile.length < blitzPile.length) {
-                //         setBlitzPile(deck.blitzPile);
-                //         setPostPile(deck.postPile);
-                //     }else if (deck.postPile.length < postPile.length){
-                //         setPostPile(deck.postPile);
-                //     }
-                //
-                //     if (deck.woodPile < woodPile) {
-                //         setWoodPile(deck.woodPile);
-                //     }
-                // }
             }
         });
 
@@ -110,7 +96,7 @@ const GameTime: React.FC = () => {
     }, [keys, playerName, db]);
 
     const isDeckDifferent = ( dbDeck: Deck) => {
-        if(!dbDeck) return true;
+
         if(dbDeck.blitzPile && dbDeck.blitzPile.length !== blitzPile.length) return true;//seems like a dangerous use of local state might be okay practice though
         if(dbDeck.woodPile && dbDeck.woodPile.length !== woodPile.length) return true;
         if(dbDeck.postPile && dbDeck.postPile.length !== postPile.length) return true;

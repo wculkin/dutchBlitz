@@ -189,18 +189,21 @@ export const updateTransactGameStateWithTwoTransactsAndUpdateScore = async (play
         const pathToPlayerHand = path + `/decks/${encodedName}`
         const playerHandReference = ref(database, pathToPlayerHand);
         let curDeck = null
+        let isOver = false
         await runTransaction(playerHandReference, (deck: any) => {
             if (deck === null) {
                 throw new Error('Deck does not exist');
             }
             console.log("The deck is ", deck);
-              curDeck = removeCardFromPlayerHand(cardToAddToBoard, deck, playerName);
+             curDeck = removeCardFromPlayerHand(cardToAddToBoard, deck, playerName);
+             isOver = curDeck.blitzPile.length === 0? true:false
              return curDeck
         });
 
         const updates: { [key: string]: any } = {};
-         if (curDeck !== null){
+         if (curDeck){
              updates[`scores/${encodedName}`] = getPlayerScore(curDeck);
+             updates[`isOver`] = isOver;
              const gameStateRef = ref(database, path);
              await update(gameStateRef, updates)
             .then(() => {
@@ -219,7 +222,7 @@ export const updateTransactGameStateWithTwoTransactsAndUpdateScore = async (play
 };
 
 
-const removeCardFromPlayerHand = (card: CardProps,deck:Deck, playerName:string) => {
+const removeCardFromPlayerHand = (card: CardProps,deck:Deck, playerName:string): Deck => {
         const matchesCard = (c: CardProps) => c.color === card.color && c.number === card.number;
 
     // Move a card from blitzPile to postPile if needed
