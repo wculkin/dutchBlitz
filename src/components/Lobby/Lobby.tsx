@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import {collection, getDocs, addDoc, doc, onSnapshot, query, limit, setDoc, where} from 'firebase/firestore';
 import Firebase from "../Firebase";
+import {httpsCallable} from 'firebase/functions';
+
 import './Lobby.css'
-import waitingRoom from "../WaitingRoom/WaitingRoom";
 import {WaitingRoom} from "../../apis/waitingRoomServices";
-import { v4 as uuidv4 } from 'uuid';
 import {useNavigate} from "react-router-dom";
 
 
@@ -36,23 +36,23 @@ const Lobby: React.FC = () => {
     return () => unsubscribe();
   }, [db]);
 
-  // Create a new game
   const createNewGame = async () => {
-    try {
-      const newGame: WaitingRoom = {
-        id: uuidv4(),
-        players: [],
-        hasStarted: false,
-        gameType: 'standard'
-      };
-      const docRef = doc(db, 'waitingRooms', newGame.id);
-      await setDoc(docRef, newGame);
-      // setGames([...games, { id: docRef.id, ...newGame }]);
-      // setNewGameName('');
-    } catch (error) {
-      console.error('Error creating new game:', error);
-    }
-  };
+    const handleWaitingRoomEvent = async (eventType: string, params: any) => {
+  const handleEvent:any = httpsCallable(firebase.functions, 'handleWaitingRoom');
+
+  try {
+    const result = await handleEvent({ eventType, params });
+    console.log('Success:', result.data);
+    return result.data;
+  } catch (error) {
+    console.error('Error calling Cloud Function:', error);
+    throw error;
+  }
+};
+
+
+    await handleWaitingRoomEvent('CREATE_WAITING_ROOM', {});
+  }
 
   // Join an existing game
   const joinGame = (gameId: string) => {

@@ -1,5 +1,6 @@
 import {doc, getDoc, updateDoc, arrayUnion, arrayRemove, connectFirestoreEmulator} from 'firebase/firestore';
 import Firebase from "../components/Firebase";
+import {PlayerScore} from "../../functions/src/interfaces";
 
 // Define the Player type
 interface Player {
@@ -11,9 +12,13 @@ interface Player {
 export interface WaitingRoom {
   id: string;
   players: string[];
+  firstRound: boolean;
   hasStarted: boolean;
+  isGameOver: boolean;
+  roundInProgress: boolean;
   gameType: string;
-  route?: string
+  route?: string;
+  scores?: PlayerScore[];
 }
 
 // Initialize Firebase instance

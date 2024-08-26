@@ -6,53 +6,67 @@
  *
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
-import {onValueWritten} from "firebase-functions/v2/database";
-import {initializeApp} from "firebase-admin/app";
-import {makeComputerMove} from "./gameFunctions";
+// import {onValueWritten} from "firebase-functions/v2/database";
 import {onCall} from "firebase-functions/v2/https";
+
+import {WaitingRoomHandler} from "./waitingRoomHandler";
+import {PlayerMoveHandler} from "./playerMoveHandler";
 import {Firebase} from "./Firebase";
-import {ref, update, runTransaction, getDatabase} from 'firebase/database';
-
-
-// Initialize Firebase Admin SDK
-initializeApp();
+import * as admin from "firebase-admin";
 
 // Define a function that listens to changes in the specified path
 const refR = "/computer/gameStates/{uuid}";
+admin.initializeApp();
 
 
-const firestore = new Firebase();
-const gameStateRef = ref(firestore.realTime, refR);
-export const gameStateChangeListener = onValueWritten(refR, async (event) => {
-  const snapshot = event.data.after;
-  const previousSnapshot = event.data.before;
+// export const gameStateChangeListener = onValueWritten(refR, async (event) => {
+//   // const snapshot = event.data.after;
+//   // const previousSnapshot = event.data.before;
+//   // console.log(previousSnapshot);
+//   //
+//   // // console.log(`Data changed for game with uuid: ${event.params.uuid}`);
+//   // // console.log("New data:", snapshot.val());
+//   // // console.log("Previous data:", previousSnapshot.val());
+//   //
+//   // const newState = makeComputerMove(snapshot.val());
+//   // await update(gameStateRef, newState)
+//   //   .then(() => {
+//   //     console.log("Document successfully updated!");
+//   //   })
+//   //   .catch((error) => {
+//   //     console.error("Error updating document: ", error);
+//   //   });
+//   console.log("fv");
+//   return {success: true, message: "Move registered successfully"};
+//   // Implement your custom logic here
+// });
+//
+//
+// export const makePlayerMove = onCall((event) => {
+//   // Add your logic here
+//   // Example: Log the player's move
+//   // console.log(`Event ${event} `);
+//   // const functionHandler = new PlayerMoveHandler();
+//   // functionHandler.handleEvent(event);
+//
+//   // Implement your custom logic here
+//   // You can interact with Firestore, Authentication, etc.
+//
+//   return {success: true, message: "Move registered successfully"};
+// });
 
-  // console.log(`Data changed for game with uuid: ${event.params.uuid}`);
-  // console.log("New data:", snapshot.val());
-  // console.log("Previous data:", previousSnapshot.val());
+export const handleWaitingRoom = onCall((event) => {
+  const {eventType, params} = event.data;
 
-  const newState = makeComputerMove(snapshot.val());
-  await update(gameStateRef, newState)
-        .then(() => {
-            console.log('Document successfully updated!');
-        })
-        .catch((error) => {
-            console.error('Error updating document: ', error);
-        });
-
-  // Implement your custom logic here
-});
-
-
-export const makePlayerMove = onCall((event) => {
-  // Add your logic here
-
-
-  // Example: Log the player's move
-  console.log(`Event ${event} `);
-
+  // Log the extracted eventType and params for debugging
+  console.log(`Event Type: ${eventType}`);
+  console.log("Params: ", params);
+  const firebase = new Firebase();
+  const functionHandler = new WaitingRoomHandler(firebase);
+  functionHandler.handleEvent(eventType, params);
   // Implement your custom logic here
   // You can interact with Firestore, Authentication, etc.
 
-  return {success: true, message: "Move registered successfully"};
+  return {success: true, message: "handledWaitingRoom"};
 });
+
