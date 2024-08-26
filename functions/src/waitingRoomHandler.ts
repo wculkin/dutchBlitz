@@ -2,6 +2,7 @@ import {Firebase} from "./Firebase";
 import {WaitingRoom} from "./waitingRoomServices";
 import {v4 as uuidv4} from "uuid";
 import * as admin from "firebase-admin";
+import {FieldValue} from "firebase-admin/firestore";
 
 
 export const ADD_PLAYER = "ADD_PLAYER";
@@ -13,20 +14,24 @@ export class WaitingRoomHandler {
   mapActionToFunction: Map<string, any>;
   firebase: Firebase;
   constructor(firebase: Firebase) {
-    this.mapActionToFunction = new Map<string, any>();
-    // this.mapActionToFunction.set(ADD_PLAYER, this.addPlayerToWaitingRoom);
-    // this.mapActionToFunction.set(DELETE_PLAYER, this.deletePlayerFromWaitingRoom);
-    // this.mapActionToFunction.set(START_ROUND, this.handleStartRound);
-    this.mapActionToFunction.set(CREATE_WAITING_ROOM, this.createWaitingRoom);
     this.firebase = firebase;
+    console.log("in const ", this.firebase);
+    this.mapActionToFunction = new Map<string, any>();
+    this.mapActionToFunction.set(ADD_PLAYER, (params:any) => this.addPlayerToWaitingRoom(params));
+    this.mapActionToFunction.set(DELETE_PLAYER, (params:any) => this.deletePlayerFromWaitingRoom(params));
+    // this.mapActionToFunction.set(START_ROUND, this.handleStartRound);
+    this.mapActionToFunction.set(CREATE_WAITING_ROOM, (params:any) => this.createWaitingRoom());
   }
-  public async handleEvent(eventType:string, params:any) {
+  async handleEvent(eventType:string, params: any) {
     console.log(`EventType ${eventType} `);
     console.log(`params ${params} `);
+
     this.mapActionToFunction.get(eventType)(params);
   }
 
   private async createWaitingRoom() {
+    console.log("this", this);
+    console.log("in calss ", this.firebase);
     try {
       const newGame: WaitingRoom = {
         isGameOver: false,
@@ -38,28 +43,28 @@ export class WaitingRoomHandler {
         gameType: "standard",
       };
       console.log("the game ID", newGame.id);
-      await admin.firestore().collection("waitingRooms").doc(newGame.id).set(newGame);
+      await this.firebase.setFireStoreDoc("waitingRooms", newGame.id, newGame);
       console.log("made the call ");
-      // const docRef = this.firebase.db.collection("waitingRooms").doc(newGame.id);
-      // await docRef.set(newGame);
     } catch (error) {
       console.error("Error creating new game:", error);
     }
   }
-  // private async addPlayerToWaitingRoom(playerToAdd:string, roomId: string) {
-  //   const docRef = doc(this.firebase.db, "waitingRooms", roomId);
-  //   await updateDoc(docRef, {
-  //     players: arrayUnion(playerToAdd),
-  //     updatedAt: new Date(),
-  //   });
-  // }
-  // private async deletePlayerFromWaitingRoom(roomId: string, player: string) {
-  //   const docRef = doc(this.firebase.db, "waitingRooms", roomId);
-  //   await updateDoc(docRef, {
-  //     players: arrayRemove(player),
-  //     updatedAt: new Date(),
-  //   });
-  // }
+  private async addPlayerToWaitingRoom(params:any) {
+    const {playerToAdd, roomId} = params;
+    const updates = {
+      players: [playerToAdd],
+      updatedAt: new Date(),
+    };
+    await this.firebase.updateFireStoreDoc("waitingRooms", roomId, updates);
+  }
+  private async deletePlayerFromWaitingRoom(params:any) {
+    const {player, roomId} = params;
+    const updates = {
+      players: [],
+      updatedAt: new Date(),
+    };
+    await this.firebase.updateFireStoreDoc("waitingRooms", roomId, updates);
+  }
   //
   // private async handleStartRound(roomId: string, scoreToPlayTo: number) {
   //   // TODO next steps maybe run a transaction in case multiple people start at the same time low priority

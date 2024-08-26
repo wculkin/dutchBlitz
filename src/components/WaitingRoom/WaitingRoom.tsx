@@ -11,7 +11,7 @@ import * as ROUTES from '../../constants/routes';
 import {doc, onSnapshot} from "firebase/firestore";
 import {useFirebase} from "../Firebase/context";
 import {useParams} from "react-router";
-import {createGameState} from "../../apis/gameServicesWithRealTimeDB";
+import {createGameState, fetchDataFromPath} from "../../apis/gameServicesWithRealTimeDB";
 
 
 const WaitingRoom: React.FC = () => {
@@ -21,6 +21,7 @@ const WaitingRoom: React.FC = () => {
      const db = firebase.db
     const { keys } = useParams<{ keys: string }>();
      const [numberComputers, setNumberComputers] = useState<number>(0);
+     const [scoreToPlayTo, setScoreToPlayTo] = useState<number>(50);
 
 
     //const [players, setPlayers] = useState<Map<String,Player>>(new Map());
@@ -69,9 +70,7 @@ const WaitingRoom: React.FC = () => {
             return
         }
         if (playerName) {
-            // const newPlayers = [...players,playerName]
-            // setPlayers(newPlayers);
-            await addPlayerToWaitingRoom(keys as string,playerName)
+            await firebase.doCallCloudFunction('ADD_PLAYER', {roomId:keys as string,playerToAdd:playerName} )
         }
     };
     const handleAddComputerPlayer = async() => {
@@ -86,18 +85,21 @@ const WaitingRoom: React.FC = () => {
     };
     const handleRemovePlayer = async() => {
         if (playerName) {
-            await deletePlayerFromWaitingRoom(keys as string,playerName)
+            await firebase.doCallCloudFunction('DELETE_PLAYER', {roomId:keys as string,player:playerName} )
         }
     }
     const  handleStartGame= async() => {
-        const route = await createGameState(players,keys as string)
+        const route = await createGameState(players,keys as string,scoreToPlayTo)
         await updateWaitingRoomForGameStart(keys as string, route)
     }
 
-     const navigateToGameBoard = (route: string) => {
+     const navigateToGameBoard  = async(route: string) => {
         console.log("route ", route)
-
-         const rightRoute = '/' + route
+        const roundInfo = await fetchDataFromPath(route+"/GameRounds")
+         if(roundInfo === null){
+             console.log("no round")
+         }
+         const rightRoute = '/' + route + '/' + roundInfo
         navigate(rightRoute);
   };
     const isPlayerInGame = () => {
