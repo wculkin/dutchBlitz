@@ -1,9 +1,8 @@
 import { initializeApp, FirebaseApp } from 'firebase/app';
-import { getAuth, Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import 'firebase/auth';
+import { getAuth, Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, connectAuthEmulator } from 'firebase/auth';
 import { getFirestore, Firestore, connectFirestoreEmulator } from 'firebase/firestore';
 import {connectDatabaseEmulator, Database, getDatabase} from 'firebase/database';
-import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
+import {getFunctions, connectFunctionsEmulator, httpsCallable} from 'firebase/functions';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -42,11 +41,23 @@ class Firebase {
     // if (window.location.hostname === "localhost") {
     //   connectDatabaseEmulator(this.realTime,"localhost", 9000); // or whatever port your emulator is running on
     // }
-    // if (window.location.hostname === "localhost") {
-    //   connectFunctionsEmulator(this.functions,"localhost", 5001); // or whatever port your emulator is running on
-    // }
       this.auth = getAuth(this.app);
+     //connectAuthEmulator(this.auth, 'http://localhost:9099');
+
   }
+
+  doCallCloudFunction = async (eventType: string, params: any) => {
+    const handleEvent:any = httpsCallable(this.functions, 'handleWaitingRoom');
+
+    try {
+      const result = await handleEvent({ eventType, params });
+      console.log('Success:', result.data);
+      return result.data;
+    } catch (error) {
+      console.error('Error calling Cloud Function:', error);
+      throw error;
+    }
+  };
 
   doCreateUserWithEmailAndPassword = (email: string, password: string) => {
     return createUserWithEmailAndPassword(this.auth, email, password);
@@ -63,6 +74,7 @@ class Firebase {
 }
 
 export default Firebase;
+
 
 
 // Import the functions you need from the SDKs you need

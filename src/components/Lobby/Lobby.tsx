@@ -37,21 +37,7 @@ const Lobby: React.FC = () => {
   }, [db]);
 
   const createNewGame = async () => {
-    const handleWaitingRoomEvent = async (eventType: string, params: any) => {
-  const handleEvent:any = httpsCallable(firebase.functions, 'handleWaitingRoom');
-
-  try {
-    const result = await handleEvent({ eventType, params });
-    console.log('Success:', result.data);
-    return result.data;
-  } catch (error) {
-    console.error('Error calling Cloud Function:', error);
-    throw error;
-  }
-};
-
-
-    await handleWaitingRoomEvent('CREATE_WAITING_ROOM', {});
+    await firebase.doCallCloudFunction('CREATE_WAITING_ROOM', {});
   }
 
   // Join an existing game
