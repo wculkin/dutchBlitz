@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import GameBoard from "../GameBoard/GameBoard";
 import Scores, {PlayerScore} from "../Scores/Scores";
 import {useLocation, useParams} from "react-router";
-import { GameState} from "../../apis/gameServices";
 import { Deck, GameInfo } from "../../sharedStuff/GameInfo";
 import { CardProps, Colors } from "../../sharedStuff/cardEnums";
 import { useGlobalState } from "../Firebase/GlobalUser";
@@ -11,10 +10,9 @@ import { useNavigate } from "react-router-dom";
 import PlayerHand from "../PlayerHand/PlayerHand";
 import { deserializeGameBoard, encodeKey } from "../../sharedStuff/helpers";
 import { useFirebase } from "../Firebase/context";
-import { getDatabase, ref, onValue, update } from 'firebase/database';
+import {getDatabase, ref, onValue, update, get} from 'firebase/database';
 import {
-    updateGameState,
-    updateTransactGameState, updateTransactGameStateWithTwoTransactsAndUpdateScore,
+    GameRound, GameState,
 
 } from "../../apis/gameServicesWithRealTimeDB";
 
@@ -39,7 +37,7 @@ const GameTime: React.FC = () => {
         navigate(ROUTES.SIGN_IN);
     }
 
-    const [gameBoard, setGameBoard] = useState<CardProps[][]>([]);
+    const [gameBoard, setGameBoard] = useState<CardProps[][] >([]);
     const [isOver, setIsOver] = useState<boolean>(false);
     const [scores, setScores] = useState<{ [key: string]: PlayerScore } | null>(null);
     const [playerName, setPlayerName] = useState(user!.email);
@@ -50,43 +48,67 @@ const GameTime: React.FC = () => {
     const [selectedCard, setSelectedCard] = useState<CardProps | null>(null);
     const [path, setPath] = useState("")
     const { keys } = useParams<{ keys: string }>();
+    const gameRound  = 0;
     const location = useLocation();
     useEffect(() => {
         if (!keys) return;
-        let curPath = `gameStates/${keys}`
+        console.log("gameRound", gameRound);
+        let curPath = `gameStates/${keys}/gameRounds/${gameRound}`
         if(location.pathname.includes("computer")){
-            curPath = `computer/gameStates/${keys}`
+            curPath = `computer/gameStates/${keys}/gameRounds/${gameRound}`
         }
         setPath(curPath)
+        console.log("the path", curPath)
 
         const gameStateRef = ref(db, curPath);
         const unsubscribe = onValue(gameStateRef, (snapshot) => {
             if (snapshot.exists()) {
-                console.log("we heard new gameState ", snapshot.val() )
-                const gameState = snapshot.val() as GameState;
-                const curBoard = deserializeGameBoard(gameState.board);
+                console.log("we heard new gameRound info ", snapshot.val())
+                const curRound = snapshot.val() as GameRound;
+                console.log("serialized ", curRound.board)
+                console.log("da fuck")
+                const serialized = curRound.board
+                const gameBoardE: CardProps[][] = [];
+                const length = Object.keys(serialized).length;
 
-                if (gameBoard.length === 0) {
-                    setGameBoard(curBoard);
-                } else {
-                    let boolFlag = false;
-                    for (let i = 0; i < curBoard.length; i++) {
-                        for (let j = 0; j < curBoard[i].length; j++) {
-                            if (curBoard[i][j].number > gameBoard[i][j].number) {
-                                curBoard[i][j] = gameBoard[i][j];
-                                boolFlag = true;
-                            }
-                        }
-                    }
-                    if (boolFlag) {
-                        setGameBoard(curBoard);
-                    }
+                for (let i = 0; i < length / 4; i++) {
+                    gameBoardE.push([])
                 }
+                Object.keys(serialized).forEach((key: string) => {
+                    const curPile = serialized[key]
+                    const value: CardProps = curPile[curPile.length - 1];
+                    const curNum = parseInt(key)
+                    const i = Math.floor(curNum / 4)
+                    const j = curNum % 4
+                    gameBoardE[i][j] = value
+                });
+                const curBoard = gameBoardE
+                setGameBoard(curBoard);
+                // todo fix the deserializeGameBoard function
+                //const curBoard = deserializeGameBoard(curRound.board);
+
+                console.log("curBoard ", curBoard)
+                // if (!gameBoard) {
+                //     setGameBoard(curBoard);
+                // } else {
+                //     let boolFlag = false;
+                //     for (let i = 0; i < curBoard.length; i++) {
+                //         for (let j = 0; j < curBoard[i].length; j++) {
+                //             if (curBoard[i][j].number > gameBoard[i][j].number) {
+                //                 curBoard[i][j] = gameBoard[i][j];
+                //                 boolFlag = true;
+                //             }
+                //         }
+                //     }
+                //     if (boolFlag) {
+                //         setGameBoard(curBoard);
+                //     }
+                // }
                 const encodedPlayerName = encodeKey(playerName as string);
-                setScores(gameState.scores);
-                setIsOver(gameState.isOver);
-                const deck = gameState.decks[encodedPlayerName];
-                if(isDeckDifferent(deck)){
+                setScores(curRound.scores);
+                setIsOver(curRound.isRoundOver);
+                const deck = curRound.decks[encodedPlayerName];
+                if (isDeckDifferent(deck)) {
                     setPlayerHand(deck)
                 }
             }
@@ -108,6 +130,10 @@ const GameTime: React.FC = () => {
     }
 
     const handleCardClickOnGameBoard = async (card: CardProps) => {
+        console.log("card clicked ", card)
+        console.log("card from hand ", selectedCard)
+        console.log("gameRound ", gameRound)
+
         if (selectedCard == null || selectedCardId === -1) return;
         if (card.color !== Colors.Blank && card.color !== selectedCard.color) return;
         if (card.number + 1 !== selectedCard.number) return;
@@ -115,8 +141,10 @@ const GameTime: React.FC = () => {
         // selectedCard.positionX = card.positionX;
         // selectedCard.positionY = card.positionY;
         //const deckWithRemovedCard: Deck = removeCardFromPlayerHand(selectedCard) as Deck;
+        if (gameRound < 0 ) return;
 
-        await updateTransactGameStateWithTwoTransactsAndUpdateScore(playerName as string, selectedCard, card,path);
+        //await updateTransactGameStateWithTwoTransactsAndUpdateScore(playerName as string, selectedCard, card,path,parseInt(gameRound));
+        await firebase.doCallCloudFunction('MAKE_PLAYER_MOVE', {playerName,cardToAddToBoard:selectedCard,positionOnBoard:card.position,pathToCurrentRound:path} )
         setSelectedCard(null);
         setSelectedCardId(-1);
     };
