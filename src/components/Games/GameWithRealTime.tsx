@@ -78,6 +78,9 @@ const GameTime: React.FC = () => {
             if (snapshot.exists()) {
                 console.log("we heard new gameRound info ", snapshot.val())
                 const curRound = snapshot.val() as GameRound;
+                if(curRound.isRoundOver){
+                    navigate(`/waitingRoom/${keys}`);
+                }
                 console.log("serialized ", curRound.board)
                 console.log("da fuck")
                 const serialized = curRound.board
