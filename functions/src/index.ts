@@ -54,19 +54,16 @@ admin.initializeApp();
 //
 //   return {success: true, message: "Move registered successfully"};
 // });
+const firebase = new Firebase();
+const functionHandler:WaitingRoomHandler = new WaitingRoomHandler(firebase);
 
-export const handleWaitingRoom = onCall((event) => {
+export const handleWaitingRoom = onCall(async (event) => {
   const {eventType, params} = event.data;
-
   // Log the extracted eventType and params for debugging
   console.log(`Event Type: ${eventType}`);
   console.log("Params: ", params);
-  const firebase = new Firebase();
-  const functionHandler = new WaitingRoomHandler(firebase);
-  functionHandler.handleEvent(eventType, params);
-  // Implement your custom logic here
-  // You can interact with Firestore, Authentication, etc.
 
+  await functionHandler.handleEvent(eventType, params);
   return {success: true, message: "handledWaitingRoom"};
 });
 
