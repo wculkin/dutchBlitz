@@ -10,7 +10,7 @@ export const DELETE_PLAYER = "DELETE_PLAYER";
 export const START_ROUND = "START_ROUND";
 export const CREATE_WAITING_ROOM = "CREATE_WAITING_ROOM";
 
-export class WaitingRoomHandler {
+export class OnCallHandler {
   mapActionToFunction: Map<string, any>;
   firebase: Firebase;
   constructor(firebase: Firebase) {

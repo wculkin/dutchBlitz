@@ -9,7 +9,7 @@
 // import {onValueWritten} from "firebase-functions/v2/database";
 import {onCall} from "firebase-functions/v2/https";
 
-import {WaitingRoomHandler} from "./waitingRoomHandler";
+import {OnCallHandler} from "./onCallHandler";
 import {PlayerMoveHandler} from "./playerMoveHandler";
 import {Firebase} from "./Firebase";
 import * as admin from "firebase-admin";
@@ -55,9 +55,9 @@ admin.initializeApp();
 //   return {success: true, message: "Move registered successfully"};
 // });
 const firebase = new Firebase();
-const functionHandler:WaitingRoomHandler = new WaitingRoomHandler(firebase);
+const functionHandler:OnCallHandler = new OnCallHandler(firebase);
 
-export const handleWaitingRoom = onCall(async (event) => {
+export const handleOnCall = onCall(async (event) => {
   const {eventType, params} = event.data;
   // Log the extracted eventType and params for debugging
   console.log(`Event Type: ${eventType}`);
