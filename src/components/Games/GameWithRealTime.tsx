@@ -15,6 +15,7 @@ import {
     GameRound, GameState,
 
 } from "../../apis/gameServicesWithRealTimeDB";
+import {useObject} from "react-firebase-hooks/database";
 
 export type GameBoardProps = {
     gameInfo: GameInfo;
@@ -31,6 +32,19 @@ const GameTime: React.FC = () => {
     const firebase = useFirebase();
     const db = getDatabase(firebase.app); // Use Realtime Database
     const { user } = useGlobalState();
+    const { keys } = useParams<{ keys: string }>();
+    const dataRef = ref(db, `gameStates/${keys}`);
+    const [snapshot, loading, error] = useObject(dataRef);
+    let roundInfo = 0;
+    if (!loading){
+        const gameState:GameState = snapshot?.val()
+        for(let i = gameState.gameRounds.length-1; i > -1;i--){
+            if(gameState.gameRounds[i].hasStarted){
+                roundInfo = i;
+                break
+            }
+        }
+    }
 
     if (!user) {
         alert("You need to sign in");
@@ -47,8 +61,7 @@ const GameTime: React.FC = () => {
     const [selectedCardId, setSelectedCardId] = useState(-1);
     const [selectedCard, setSelectedCard] = useState<CardProps | null>(null);
     const [path, setPath] = useState("")
-    const { keys } = useParams<{ keys: string }>();
-    const gameRound  = 0;
+    const gameRound  = roundInfo;
     const location = useLocation();
     useEffect(() => {
         if (!keys) return;
@@ -276,7 +289,8 @@ const GameTime: React.FC = () => {
 
 
 
-
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>Error loading data</div>;
     return (
         <div>
             {scores && (
