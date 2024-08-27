@@ -94,12 +94,7 @@ const WaitingRoom: React.FC = () => {
 
      const navigateToGameBoard  = async(route: string) => {
         console.log("route ", route)
-        const roundInfo = await fetchDataFromPath(route+"/GameRounds")
-         if(roundInfo === null){
-             console.log("no round")
-         }
-         const rightRoute = '/' + route + '/' + roundInfo
-        navigate(rightRoute);
+        navigate(route);
   };
     const isPlayerInGame = () => {
         for (let val of players){

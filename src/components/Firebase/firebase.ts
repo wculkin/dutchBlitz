@@ -3,6 +3,7 @@ import { getAuth, Auth, createUserWithEmailAndPassword, signInWithEmailAndPasswo
 import { getFirestore, Firestore, connectFirestoreEmulator } from 'firebase/firestore';
 import {connectDatabaseEmulator, Database, getDatabase} from 'firebase/database';
 import {getFunctions, connectFunctionsEmulator, httpsCallable} from 'firebase/functions';
+import {handleOnCall} from "../../../functions/src";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -47,7 +48,7 @@ class Firebase {
   }
 
   doCallCloudFunction = async (eventType: string, params: any) => {
-    const handleEvent:any = httpsCallable(this.functions, 'handleWaitingRoom');
+    const handleEvent:any = httpsCallable(this.functions, 'handleOnCall');
 
     try {
       const result = await handleEvent({ eventType, params });
