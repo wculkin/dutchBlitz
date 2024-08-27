@@ -1,6 +1,5 @@
 import {CardProps, Colors, Deck, Player, PlayerScore} from "./interfaces";
-import {arrayUnion} from "firebase/firestore";
-import {encodeKey, IS_ROUND_OVER} from "./playerMoveHandler";
+import {encodeKey, IS_ROUND_OVER} from "./onCallHandler";
 
 
 export type GameRound = {
@@ -76,6 +75,9 @@ export const removeCardFromPlayerHand = (card: CardProps, deck:Deck, playerName:
 };
 
 export function validateMoveIsValid(curRound:GameRound, cardToAddToBoard:CardProps, positionOnBoard:number) {
+  console.log("curRound ", curRound);
+  console.log("cardToAddToBoard ", cardToAddToBoard);
+  console.log("positionOnBoard ", positionOnBoard);
   if (cardToAddToBoard == null) {
     return false;
   }
@@ -97,12 +99,13 @@ export function validateMoveIsValid(curRound:GameRound, cardToAddToBoard:CardPro
 }
 
 
-export function createUpdates(position:number, encodedName: string, cardToAddToBoard:CardProps, playerDeck:Deck) {
+export function createUpdates(position:number, encodedName: string, cardToAddToBoard:CardProps, playerDeck:Deck, oldCardPile: CardProps[]) {
   const updates: { [key: string]: any } = {};
   const updatedPlayerHand = removeCardFromPlayerHand(cardToAddToBoard, playerDeck, encodedName);
   const isOver = updatedPlayerHand.blitzPile.length === 0 ? true: false;
   cardToAddToBoard.position = position;
-  updates[`board/${position}`] = arrayUnion(cardToAddToBoard);
+  oldCardPile.push(cardToAddToBoard);
+  updates[`board/${position}`] = oldCardPile;
   updates[`decks/${encodedName}`] = updatedPlayerHand;
   updates[`scores/${encodedName}`] = calculateRoundScore(updatedPlayerHand);
   if (IS_ROUND_OVER) updates[IS_ROUND_OVER] = isOver;

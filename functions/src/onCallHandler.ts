@@ -3,8 +3,6 @@ import {WaitingRoom} from "./waitingRoomServices";
 import {v4 as uuidv4} from "uuid";
 import {FieldValue} from "firebase-admin/firestore";
 import {createNewGameState, createUpdates, GameRound, getNewRound, validateMoveIsValid} from "./gameServices";
-import {CardProps} from "./interfaces";
-
 
 export const ADD_PLAYER = "ADD_PLAYER";
 export const DELETE_PLAYER = "DELETE_PLAYER";
@@ -111,7 +109,7 @@ export class OnCallHandler {
     if (!validateMoveIsValid(curRound, cardToAddToBoard, positionOnBoard)) {
       throw new Error(`${playerName} is not valid`);
     }
-    const updates: { [key: string]: any } = createUpdates(positionOnBoard, encodedName, cardToAddToBoard, curRound.decks[encodedName]);
+    const updates: { [key: string]: any } = createUpdates(positionOnBoard, encodedName, cardToAddToBoard, curRound.decks[encodedName],curRound.board[positionOnBoard]);
     await this.firebase.updateDocument(pathToCurrentRound, updates);
     // todo should right a function to check all arrays make sense
     // todo end game shit

@@ -10,7 +10,6 @@
 import {onCall} from "firebase-functions/v2/https";
 
 import {OnCallHandler} from "./onCallHandler";
-import {PlayerMoveHandler} from "./playerMoveHandler";
 import {Firebase} from "./Firebase";
 import * as admin from "firebase-admin";
 
@@ -39,20 +38,6 @@ admin.initializeApp();
 //   console.log("fv");
 //   return {success: true, message: "Move registered successfully"};
 //   // Implement your custom logic here
-// });
-//
-//
-// export const makePlayerMove = onCall((event) => {
-//   // Add your logic here
-//   // Example: Log the player's move
-//   // console.log(`Event ${event} `);
-//   // const functionHandler = new PlayerMoveHandler();
-//   // functionHandler.handleEvent(event);
-//
-//   // Implement your custom logic here
-//   // You can interact with Firestore, Authentication, etc.
-//
-//   return {success: true, message: "Move registered successfully"};
 // });
 const firebase = new Firebase();
 const functionHandler:OnCallHandler = new OnCallHandler(firebase);
