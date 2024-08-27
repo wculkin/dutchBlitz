@@ -89,8 +89,7 @@ const WaitingRoom: React.FC = () => {
         }
     }
     const  handleStartGame= async() => {
-        const route = await createGameState(players,keys as string,scoreToPlayTo)
-        await updateWaitingRoomForGameStart(keys as string, route)
+        await firebase.doCallCloudFunction('START_ROUND', {roomId: keys, scoreToPlayTo} )
     }
 
      const navigateToGameBoard  = async(route: string) => {
