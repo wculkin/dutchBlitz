@@ -3,15 +3,12 @@ import { useNavigate} from 'react-router-dom';
 import './WaitingRoom.css';
 import {
     addPlayerToWaitingRoom,
-    deletePlayerFromWaitingRoom,
-    updateWaitingRoomForGameStart
 } from "../../apis/waitingRoomServices";
 import {useGlobalState} from "../Firebase/GlobalUser";
 import * as ROUTES from '../../constants/routes';
 import {doc, onSnapshot} from "firebase/firestore";
 import {useFirebase} from "../Firebase/context";
 import {useParams} from "react-router";
-import {createGameState, fetchDataFromPath} from "../../apis/gameServicesWithRealTimeDB";
 
 
 const WaitingRoom: React.FC = () => {
@@ -48,8 +45,7 @@ const WaitingRoom: React.FC = () => {
           console.log("I should fix this but am too lazy rn, probs should create a room? Or force this to be create" +
               "from the lobby, I like the lobby idea")
       }
-      if (room?.hasStarted){
-          //Navigate
+      if (room?.roundInProgress){
           console.log("we should've navigated")
           navigateToGameBoard(room.route)
       }

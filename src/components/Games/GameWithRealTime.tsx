@@ -35,16 +35,7 @@ const GameTime: React.FC = () => {
     const { keys } = useParams<{ keys: string }>();
     const dataRef = ref(db, `gameStates/${keys}`);
     const [snapshot, loading, error] = useObject(dataRef);
-    let roundInfo = 0;
-    if (!loading){
-        const gameState:GameState = snapshot?.val()
-        for(let i = gameState.gameRounds.length-1; i > -1;i--){
-            if(gameState.gameRounds[i].hasStarted){
-                roundInfo = i;
-                break
-            }
-        }
-    }
+
 
     if (!user) {
         alert("You need to sign in");
@@ -61,10 +52,21 @@ const GameTime: React.FC = () => {
     const [selectedCardId, setSelectedCardId] = useState(-1);
     const [selectedCard, setSelectedCard] = useState<CardProps | null>(null);
     const [path, setPath] = useState("")
-    const gameRound  = roundInfo;
+    const [gameRound, setGameRound]  = useState(-1);
     const location = useLocation();
+    if (!loading && gameRound === -1){
+        console.log("roundInfo")
+        const gameState:GameState = snapshot?.val()
+        for(let i = gameState.gameRounds.length-1; i > -1;i--){
+            if(gameState.gameRounds[i].hasStarted){
+                setGameRound(i)
+                break
+            }
+        }
+    }
     useEffect(() => {
         if (!keys) return;
+        if(gameRound === -1) return;
         console.log("gameRound", gameRound);
         let curPath = `gameStates/${keys}/gameRounds/${gameRound}`
         if(location.pathname.includes("computer")){
@@ -131,7 +133,7 @@ const GameTime: React.FC = () => {
         });
 
         return () => unsubscribe();
-    }, [keys, playerName, db]);
+    }, [keys, playerName, db, gameRound,path]);
 
     const isDeckDifferent = ( dbDeck: Deck) => {
 
@@ -160,7 +162,7 @@ const GameTime: React.FC = () => {
         if (gameRound < 0 ) return;
 
         //await updateTransactGameStateWithTwoTransactsAndUpdateScore(playerName as string, selectedCard, card,path,parseInt(gameRound));
-        await firebase.doCallCloudFunction('MAKE_PLAYER_MOVE', {playerName,cardToAddToBoard:selectedCard,positionOnBoard:card.position,pathToCurrentRound:path} )
+        await firebase.doCallCloudFunction('MAKE_PLAYER_MOVE', {playerName,cardToAddToBoard:selectedCard,positionOnBoard:card.position,pathToCurrentRound:path,keys} )
         setSelectedCard(null);
         setSelectedCardId(-1);
     };
