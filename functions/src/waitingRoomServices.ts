@@ -4,7 +4,6 @@ export interface WaitingRoom {
   id: string;
   players: string[];
   firstRound: boolean;
-  hasStarted: boolean;
   isGameOver: boolean;
   roundInProgress: boolean;
   gameType: string;

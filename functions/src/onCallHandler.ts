@@ -2,7 +2,13 @@ import {Firebase} from "./Firebase";
 import {WaitingRoom} from "./waitingRoomServices";
 import {v4 as uuidv4} from "uuid";
 import {FieldValue} from "firebase-admin/firestore";
-import {createNewGameState, createUpdates, GameRound, getNewRound, validateMoveIsValid} from "./gameServices";
+import {
+  createNewGameState,
+  createUpdates,
+  GameRound,
+  getNewRound,
+  validateMoveIsValid,
+} from "./gameServices";
 
 export const ADD_PLAYER = "ADD_PLAYER";
 export const DELETE_PLAYER = "DELETE_PLAYER";
@@ -21,7 +27,7 @@ export class OnCallHandler {
     this.mapActionToFunction.set(ADD_PLAYER, (params:any) => this.addPlayerToWaitingRoom(params));
     this.mapActionToFunction.set(DELETE_PLAYER, (params:any) => this.deletePlayerFromWaitingRoom(params));
     this.mapActionToFunction.set(START_ROUND, (params:any) => this.handleStartRound(params));
-    this.mapActionToFunction.set(CREATE_WAITING_ROOM, (params:any) => this.createWaitingRoom());
+    this.mapActionToFunction.set(CREATE_WAITING_ROOM, (params:any) => this.createWaitingRoom(params));
     this.mapActionToFunction.set(MAKE_PLAYER_MOVE, (params:any) => this.makePlayerMove(params));
   }
   async handleEvent(eventType:string, params: any) {
@@ -31,14 +37,12 @@ export class OnCallHandler {
     this.mapActionToFunction.get(eventType)(params);
   }
 
-  private async createWaitingRoom() {
-    console.log("this", this);
-    console.log("in calss ", this.firebase);
+  private async createWaitingRoom(params:any) {
+    console.log(params);
     try {
       const newGame: WaitingRoom = {
         isGameOver: false,
         roundInProgress: false,
-        hasStarted: false,
         id: uuidv4(),
         players: [],
         firstRound: true,
@@ -73,13 +77,12 @@ export class OnCallHandler {
     // TODO next steps maybe run a transaction in case multiple people start at the same time low priority
     const currentWaitingRoom:any = await this.firebase.getFireStoreDocument("waitingRooms", roomId);
     console.log("currentWaitingRoom ", currentWaitingRoom);
+    const gameStatePath = `/gameStates/${roomId}`;
     if (currentWaitingRoom.firstRound) {
       console.log("in the rom first round is true" );
       const gameState = createNewGameState(currentWaitingRoom.players, scoreToPlayTo, currentWaitingRoom.gameType);
-      const gameStatePath = `/gameStates/${roomId}`;
       await this.firebase.setDocument(gameStatePath, gameState);
       const updates = {
-        hasStarted: true,
         roundInProgress: true,
         firstRound: false,
         scores: gameState.totalScores,
@@ -89,17 +92,25 @@ export class OnCallHandler {
       await this.firebase.updateFireStoreDoc("waitingRooms", roomId, updates);
     } else {
       const theNewRound = getNewRound(currentWaitingRoom.players);
+      const gameState = await this.firebase.readDocument(gameStatePath);
+      const rounds = gameState.gameRounds;
+      rounds.push(theNewRound);
       // todo add update the gameState and then the waitingRoom
+      await this.firebase.setDocument(gameStatePath+"/gameRounds", rounds);
+      const updates = {
+        roundInProgress: true,
+        updatedAt: new Date(),
+      };
+      await this.firebase.updateFireStoreDoc("waitingRooms", roomId, updates);
       console.log(theNewRound);
     }
     // Should see if there is a current game
     // can either get the local data from player or call the db
     // then need to call the realtime to get info about gamestate like do we need to create a new round or not
     // then update the waiting room
-
   }
   private async makePlayerMove(params:any) {
-    const {playerName, cardToAddToBoard, positionOnBoard, pathToCurrentRound} = params;
+    const {playerName, cardToAddToBoard, positionOnBoard, pathToCurrentRound, keys} = params;
     if (pathToCurrentRound == "") {
       throw new Error("recieved a bad path");
     }
@@ -109,13 +120,22 @@ export class OnCallHandler {
     if (!validateMoveIsValid(curRound, cardToAddToBoard, positionOnBoard)) {
       throw new Error(`${playerName} is not valid`);
     }
-    const updates: { [key: string]: any } = createUpdates(positionOnBoard, encodedName, cardToAddToBoard, curRound.decks[encodedName],curRound.board[positionOnBoard]);
+    const updates: { [key: string]: any } = createUpdates(positionOnBoard, encodedName, cardToAddToBoard, curRound.decks[encodedName], curRound.board[positionOnBoard]);
     await this.firebase.updateDocument(pathToCurrentRound, updates);
+    const isRoundOver = updates[`decks/${encodedName}`].blitzPile.length === 0;
+
+    if (isRoundOver ) {
+      const updates: { [key: string]: any } = {
+        [IS_ROUND_OVER]: isRoundOver,
+      };
+      const data = {
+        roundInProgress: false,
+      };
+      await this.firebase.updateFireStoreDoc("waitingRooms", keys, data);
+      await this.firebase.updateDocument(pathToCurrentRound, updates);
+    }
     // todo should right a function to check all arrays make sense
     // todo end game shit
-    if (updates[IS_ROUND_OVER]) {
-      // update the waiting room to not redirect
-    }
   }
   private async getCurrentRoundInformation(path: string) {
     // todo write this to double check we have the right round
