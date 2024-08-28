@@ -15,9 +15,10 @@ export interface WaitingRoom {
   firstRound: boolean;
   isGameOver: boolean;
   roundInProgress: boolean;
+  hasTheGameStarted: boolean;
   gameType: string;
   route?: string;
-  scores?: PlayerScore[];
+  scores?: { [key: string]: PlayerScore };
 }
 
 // Initialize Firebase instance

@@ -20,7 +20,7 @@ const Lobby: React.FC = () => {
   useEffect(() => {
    // Create a reference to the 'waitingRooms' collection and query the first 25 documents
     const waitingRoomsRef = collection(db, 'waitingRooms');
-    const q = query(waitingRoomsRef, where("hasStarted", "==", false),limit(25));
+    const q = query(waitingRoomsRef, where("hasTheGameStarted", "==", false),limit(25));
     console.log("the query" , q)
 
     // Set up a listener for the query
@@ -64,7 +64,7 @@ const Lobby: React.FC = () => {
           </div>
           {waitingRooms.map(waitingRoom => (
               <div key={waitingRoom.id} className="game-item">
-                <span>{waitingRoom.hasStarted ? "Game In progress" : "Unstarted game"}</span>
+                <span>{waitingRoom.hasTheGameStarted ? "Game In progress" : "Unstarted game"}</span>
                 <span>{waitingRoom.players.length ? waitingRoom.players.map((player) => (<span> {player}</span>)) : "None"}</span>
                 <button onClick={() => joinGame(waitingRoom.id)} className="join-button">Join</button>
               </div>

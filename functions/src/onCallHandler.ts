@@ -41,6 +41,7 @@ export class OnCallHandler {
     console.log(params);
     try {
       const newGame: WaitingRoom = {
+        hasTheGameStarted: false,
         isGameOver: false,
         roundInProgress: false,
         id: uuidv4(),
@@ -84,6 +85,7 @@ export class OnCallHandler {
       await this.firebase.setDocument(gameStatePath, gameState);
       const updates = {
         roundInProgress: true,
+        hasTheGameStarted: true,
         firstRound: false,
         scores: gameState.totalScores,
         updatedAt: new Date(),
@@ -110,7 +112,7 @@ export class OnCallHandler {
     // then update the waiting room
   }
   private async makePlayerMove(params:any) {
-    const {playerName, cardToAddToBoard, positionOnBoard, pathToCurrentRound, keys} = params;
+    const {playerName, cardToAddToBoard, positionOnBoard, pathToCurrentRound, keys, round} = params;
     if (pathToCurrentRound == "") {
       throw new Error("recieved a bad path");
     }
@@ -125,14 +127,28 @@ export class OnCallHandler {
     const isRoundOver = updates[`decks/${encodedName}`].blitzPile.length === 0;
 
     if (isRoundOver ) {
-      const updates: { [key: string]: any } = {
-        [IS_ROUND_OVER]: isRoundOver,
+      const gameStatePath = `/gameStates/${keys}`;
+      const gameInfo = await this.firebase.readDocument(gameStatePath);
+      const roundScores = gameInfo.gameRounds[round].scores;
+      // eslint-disable-next-line guard-for-in
+      for (const key in gameInfo.totalScores) {
+        console.log("the key", key);
+        gameInfo.totalScores[key].score += roundScores[key].score;
+        if (round === 0) gameInfo.totalScores[key].score += 20;
+        if (playerName === key || encodeKey(playerName) === key) {
+          gameInfo.totalScores[key].score += 1;
+        }
+      }
+      const finalUpdates: { [key: string]: any } = {
+        [`gameRounds/${round}/` + IS_ROUND_OVER]: isRoundOver,
+        ["totalScores"]: gameInfo.totalScores,
       };
       const data = {
         roundInProgress: false,
+        scores: gameInfo.totalScores,
       };
       await this.firebase.updateFireStoreDoc("waitingRooms", keys, data);
-      await this.firebase.updateDocument(pathToCurrentRound, updates);
+      await this.firebase.updateDocument(gameStatePath, finalUpdates);
     }
     // todo should right a function to check all arrays make sense
     // todo end game shit

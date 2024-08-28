@@ -9,6 +9,8 @@ import * as ROUTES from '../../constants/routes';
 import {doc, onSnapshot} from "firebase/firestore";
 import {useFirebase} from "../Firebase/context";
 import {useParams} from "react-router";
+import {PlayerScore} from "../../../functions/src/interfaces";
+import {encodeKey} from "../../sharedStuff/helpers";
 
 
 const WaitingRoom: React.FC = () => {
@@ -19,6 +21,7 @@ const WaitingRoom: React.FC = () => {
     const { keys } = useParams<{ keys: string }>();
      const [numberComputers, setNumberComputers] = useState<number>(0);
      const [scoreToPlayTo, setScoreToPlayTo] = useState<number>(50);
+     const [playerScores, setPlayerScores] = useState<{ [key: string]: PlayerScore }>({});
 
 
     //const [players, setPlayers] = useState<Map<String,Player>>(new Map());
@@ -50,6 +53,12 @@ const WaitingRoom: React.FC = () => {
           navigateToGameBoard(room.route)
       }
       setPlayers(room!.players);
+      if(room.scores){
+          console.log(room.scores)
+          console.log(playerName)
+          setPlayerScores(room?.scores)
+      }
+
       }
     });
 
@@ -105,8 +114,11 @@ const WaitingRoom: React.FC = () => {
         <div className="wr-container">
             <h1 className="wr-header">Waiting Room</h1>
             <ul className="wr-player-list">
-                {players.map((player, index) => (
-                    <li key={index} className="wr-player-item">{player}</li>
+                {players.map((player:string, index) => (
+                    <li key={index} className="wr-player-item">
+                        {player} score: {playerScores[encodeKey(player)] !== undefined ? playerScores[encodeKey(player)].score : 0}
+                    </li>
+
                 ))}
             </ul>
             {!isPlayerInGame() && (

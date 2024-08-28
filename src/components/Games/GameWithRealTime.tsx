@@ -162,7 +162,7 @@ const GameTime: React.FC = () => {
         if (gameRound < 0 ) return;
 
         //await updateTransactGameStateWithTwoTransactsAndUpdateScore(playerName as string, selectedCard, card,path,parseInt(gameRound));
-        await firebase.doCallCloudFunction('MAKE_PLAYER_MOVE', {playerName,cardToAddToBoard:selectedCard,positionOnBoard:card.position,pathToCurrentRound:path,keys} )
+        await firebase.doCallCloudFunction('MAKE_PLAYER_MOVE', {playerName,cardToAddToBoard:selectedCard,positionOnBoard:card.position,pathToCurrentRound:path,keys, round: gameRound} )
         setSelectedCard(null);
         setSelectedCardId(-1);
     };
