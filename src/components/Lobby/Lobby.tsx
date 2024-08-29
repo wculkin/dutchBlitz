@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {collection, getDocs, addDoc, doc, onSnapshot, query, limit, setDoc, where} from 'firebase/firestore';
 import Firebase from "../Firebase";
-import {httpsCallable} from 'firebase/functions';
-
 import './Lobby.css'
-import {WaitingRoom} from "../../apis/waitingRoomServices";
 import {useNavigate} from "react-router-dom";
+import { WaitingRoom } from '../../../functions/src/waitingRoomServices';
 
 
 const Lobby: React.FC = () => {

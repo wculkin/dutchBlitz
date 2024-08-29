@@ -1,5 +1,4 @@
+import GameTime from './GameWithRealTime';
 
-import Game from './Game';
 
-
-export default Game;
+export default GameTime;

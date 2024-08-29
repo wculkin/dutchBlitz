@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import './Card.css';
-import {CardProps, Colors} from "../../sharedStuff/cardEnums";
+import {CardProps, Colors} from "../../sharedStuff/interfaces";
 
 
 

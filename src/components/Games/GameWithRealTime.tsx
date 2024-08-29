@@ -2,30 +2,15 @@ import React, { useEffect, useState } from "react";
 import GameBoard from "../GameBoard/GameBoard";
 import Scores, {PlayerScore} from "../Scores/Scores";
 import {useLocation, useParams} from "react-router";
-import { Deck, GameInfo } from "../../sharedStuff/GameInfo";
-import { CardProps, Colors } from "../../sharedStuff/cardEnums";
 import { useGlobalState } from "../Firebase/GlobalUser";
 import * as ROUTES from "../../constants/routes";
 import { useNavigate } from "react-router-dom";
 import PlayerHand from "../PlayerHand/PlayerHand";
-import { deserializeGameBoard, encodeKey } from "../../sharedStuff/helpers";
 import { useFirebase } from "../Firebase/context";
-import {getDatabase, ref, onValue, update, get} from 'firebase/database';
-import {
-    GameRound, GameState,
-
-} from "../../apis/gameServicesWithRealTimeDB";
+import {getDatabase, ref, onValue} from 'firebase/database';
 import {useObject} from "react-firebase-hooks/database";
+import {CardProps, Colors, Deck, encodeKey, GameRound, GameState} from "../../sharedStuff/interfaces";
 
-export type GameBoardProps = {
-    gameInfo: GameInfo;
-    gameBoard: CardProps[][];
-    gameKey: string;
-};
-
-type GameWithRealTimeProps = {
-    route: string
-}
 
 const GameTime: React.FC = () => {
     const navigate = useNavigate();

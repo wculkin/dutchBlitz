@@ -1,7 +1,7 @@
 import React from 'react';
 import './GameBoard.css';
 import Card from "../Card/Card";
-import {CardProps} from "../../sharedStuff/cardEnums";
+import {CardProps} from "../../../functions/src/interfaces";
 type GameBoardProps = {
   rows: CardProps[][];
   onCardClicked: (card: CardProps) => void;

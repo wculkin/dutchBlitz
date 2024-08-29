@@ -42,6 +42,9 @@ class Firebase {
     // if (window.location.hostname === "localhost") {
     //   connectDatabaseEmulator(this.realTime,"localhost", 9000); // or whatever port your emulator is running on
     // }
+    if (window.location.hostname === "localhost") {
+      connectFunctionsEmulator(this.functions,"localhost", 5001); // or whatever port your emulator is running on
+    }
       this.auth = getAuth(this.app);
      //connectAuthEmulator(this.auth, 'http://localhost:9099');
 

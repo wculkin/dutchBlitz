@@ -1,5 +1,4 @@
 import React, { createContext, useReducer, useContext, ReactNode, Dispatch } from 'react';
-import Firebase from './firebase';
 import { User } from 'firebase/auth';
 
 type State = {

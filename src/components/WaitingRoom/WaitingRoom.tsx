@@ -1,16 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import { useNavigate} from 'react-router-dom';
 import './WaitingRoom.css';
-import {
-    addPlayerToWaitingRoom,
-} from "../../apis/waitingRoomServices";
 import {useGlobalState} from "../Firebase/GlobalUser";
 import * as ROUTES from '../../constants/routes';
 import {doc, onSnapshot} from "firebase/firestore";
 import {useFirebase} from "../Firebase/context";
 import {useParams} from "react-router";
-import {PlayerScore} from "../../../functions/src/interfaces";
-import {encodeKey} from "../../sharedStuff/helpers";
+import {PlayerScore} from "../Scores/Scores";
+import { encodeKey } from '../../sharedStuff/interfaces';
+
 
 
 const WaitingRoom: React.FC = () => {
@@ -79,14 +77,16 @@ const WaitingRoom: React.FC = () => {
         }
     };
     const handleAddComputerPlayer = async() => {
+        if (true){
+            alert("Unsupported feature")
+            return
+        }
         if (players.length  > 3){
             alert("only supports max four players right now")
             return
         }
         const computerToAdd = "computer " + (numberComputers + 1).toString()
         setNumberComputers(prevState => prevState +1)
-        await addPlayerToWaitingRoom(keys as string,computerToAdd)
-
     };
     const handleRemovePlayer = async() => {
         if (playerName) {
