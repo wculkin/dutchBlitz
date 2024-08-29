@@ -5,7 +5,7 @@ import {useGlobalState} from "../Firebase/GlobalUser";
 import {useFirebase} from "../Firebase/context";
 import {encodeKey, WaitingRoom} from '../../sharedStuff/interfaces';
 
-type WaitingRoomProps = {
+export type WaitingRoomProps = {
   waitingRoom: WaitingRoom | null;
   onStartClicked: () => void;
 
@@ -42,9 +42,6 @@ const WaitingRoomInitial: React.FC<WaitingRoomProps> = ({waitingRoom, onStartCli
             await fireBase.doCallCloudFunction('DELETE_PLAYER', {roomId:waitingRoom?.id as string,player:playerName} )
         }
     }
-    console.log("waitingRoom: ", waitingRoom)
-    console.log("waitingRoom players: ", waitingRoom?.players)
-    console.log("waitingRoom scores: ", waitingRoom?.scores)
     return (
         <div className="wr-container">
             <h1 className="wr-header">Waiting Room</h1>

@@ -8,6 +8,7 @@ import * as ROUTES from "../../constants/routes";
 import {doc, onSnapshot} from "firebase/firestore";
 import WaitingRoomInitial from "./WaitingRoomInitial";
 import {WaitingRoom} from "../../sharedStuff/interfaces";
+import WaitingRoomMidGame from "./WaitingRoomMidGame";
 
 const WaitingRoomPage: React.FC = () => {
     const { user } = useGlobalState();
@@ -61,7 +62,11 @@ const WaitingRoomPage: React.FC = () => {
         navigate(route);
   };
     const getCorrectWaitingRoom = () =>{
-        return (<WaitingRoomInitial waitingRoom={waitingRoom} onStartClicked={handleStartGame}/>)
+        if(!waitingRoom || waitingRoom?.firstRound){
+            return (<WaitingRoomInitial waitingRoom={waitingRoom} onStartClicked={handleStartGame}/>)
+        }else{
+            return (<WaitingRoomMidGame waitingRoom={waitingRoom} onStartClicked={handleStartGame}/>)
+        }
     };
 
     return (<>
