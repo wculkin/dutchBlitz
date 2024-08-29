@@ -9,3 +9,5 @@ typings/
 node_modules/
 ../node_modules/
 *.local
+
+package-lock.json

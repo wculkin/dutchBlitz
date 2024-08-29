@@ -1,4 +1,4 @@
-import {CardProps, Colors, Deck, Player, PlayerScore} from "./interfaces";
+import {CardProps, Colors, Deck, PlayerScore} from "./interfaces";
 import {encodeKey, IS_ROUND_OVER} from "./onCallHandler";
 
 
@@ -59,9 +59,6 @@ export const removeCardFromPlayerHand = (card: CardProps, deck:Deck, playerName:
     const moveOver = deck.blitzPile.pop();
     deck.postPile.push(moveOver as CardProps);
   }
-
-  console.log("the card is ", card);
-
   // Remove the card from each pile by comparing color and number
   const curBlitzPile = deck.blitzPile.filter((c) => !matchesCard(c));
   const curPostPile = deck.postPile.filter((c) => !matchesCard(c));
@@ -75,9 +72,6 @@ export const removeCardFromPlayerHand = (card: CardProps, deck:Deck, playerName:
 };
 
 export function validateMoveIsValid(curRound:GameRound, cardToAddToBoard:CardProps, positionOnBoard:number) {
-  console.log("curRound ", curRound);
-  console.log("cardToAddToBoard ", cardToAddToBoard);
-  console.log("positionOnBoard ", positionOnBoard);
   if (cardToAddToBoard == null) {
     return false;
   }
@@ -102,13 +96,11 @@ export function validateMoveIsValid(curRound:GameRound, cardToAddToBoard:CardPro
 export function createUpdates(position:number, encodedName: string, cardToAddToBoard:CardProps, playerDeck:Deck, oldCardPile: CardProps[]) {
   const updates: { [key: string]: any } = {};
   const updatedPlayerHand = removeCardFromPlayerHand(cardToAddToBoard, playerDeck, encodedName);
-  const isOver = updatedPlayerHand.blitzPile.length === 0 ? true: false;
   cardToAddToBoard.position = position;
   oldCardPile.push(cardToAddToBoard);
   updates[`board/${position}`] = oldCardPile;
   updates[`decks/${encodedName}`] = updatedPlayerHand;
   updates[`scores/${encodedName}`] = calculateRoundScore(updatedPlayerHand);
-  if (IS_ROUND_OVER) updates[IS_ROUND_OVER] = isOver;
   return updates;
 }
 
@@ -142,7 +134,7 @@ function createGameRound(players: string[], isFirst: boolean) {
   }
   const round:GameRound = {
     board: gameBoard,
-    hasStarted: isFirst,
+    hasStarted: true,
     isRoundOver: false,
     decks,
     scores,

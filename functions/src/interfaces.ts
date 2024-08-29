@@ -29,15 +29,3 @@ export type PlayerScore = {
     score: number;
     blitzCardsLeft: number;
 }
-
-export type Player = {
-  id: string;
-  name: string;
-}
-
-export type UserInformation = {
-  id: string;
-  name: string;
-  gamePlayed:number;
-  recentGames: string[]; // this will be a list of game keys
-}
