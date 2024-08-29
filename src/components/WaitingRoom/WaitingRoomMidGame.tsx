@@ -1,6 +1,7 @@
 import React from "react";
 import {encodeKey} from "../../sharedStuff/interfaces";
 import {WaitingRoomProps} from "./WaitingRoomInitial";
+import './WaitingRoom.css';
 
 const WaitingRoomMidGame: React.FC<WaitingRoomProps> = ({waitingRoom, onStartClicked}) => {
     return (
