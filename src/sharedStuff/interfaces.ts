@@ -88,3 +88,15 @@ export type GameState = {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export interface WaitingRoom {
+  id: string;
+  players: string[];
+  firstRound: boolean;
+  isGameOver: boolean;
+  roundInProgress: boolean;
+  hasTheGameStarted: boolean;
+  gameType: string;
+  route?: string;
+  scores?: { [key: string]: PlayerScore };
+}

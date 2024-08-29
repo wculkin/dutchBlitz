@@ -12,11 +12,12 @@ import * as ROUTES from '../../constants/routes';
 import ProtectedRoute from "../Authitication/ProtectedRoute";
 import NotFound from "../NotFound/NotFound";
 import {useAuth} from "../../useAuth";
-import WaitingRoom from "../WaitingRoom/WaitingRoom";
+import WaitingRoomInitial from "../WaitingRoom/WaitingRoomInitial";
 import Game from "../Games";
 import './App.css';
 import Lobby from "../Lobby/Lobby";
 import GameTime from '../Games/GameWithRealTime';
+import WaitingRoomPage from "../WaitingRoom/WaitingRoomPage";
 
 
 const App: React.FC = () => {
@@ -34,7 +35,7 @@ const App: React.FC = () => {
       <Route  path={ROUTES.LANDING} element={<Lobby/>} />
       <Route  path={ROUTES.SIGN_UP} element={<SignUpPage/>} />
       <Route  path={ROUTES.SIGN_IN} element={<SignInPage/>} />
-      <Route path={ROUTES.WAITING_ROOM_KEY} element={<ProtectedRoute element={<WaitingRoom />} />} />
+      <Route path={ROUTES.WAITING_ROOM_KEY} element={<ProtectedRoute element={<WaitingRoomPage />} />} />
       <Route  path={ROUTES.GAME_WITH_KEY} element={<Game />} />
       <Route  path={ROUTES.GAME_REALTIME_WITH_KEY} element={<GameTime />} />
       <Route  path={ROUTES.GAME_WITH_COMPUTERS_REALTIME_WITH_KEY} element={<GameTime />} />
