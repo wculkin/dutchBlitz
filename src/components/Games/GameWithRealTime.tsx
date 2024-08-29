@@ -87,26 +87,6 @@ const GameTime: React.FC = () => {
                 });
                 const curBoard = gameBoardE
                 setGameBoard(curBoard);
-                // todo fix the deserializeGameBoard function
-                //const curBoard = deserializeGameBoard(curRound.board);
-
-                console.log("curBoard ", curBoard)
-                // if (!gameBoard) {
-                //     setGameBoard(curBoard);
-                // } else {
-                //     let boolFlag = false;
-                //     for (let i = 0; i < curBoard.length; i++) {
-                //         for (let j = 0; j < curBoard[i].length; j++) {
-                //             if (curBoard[i][j].number > gameBoard[i][j].number) {
-                //                 curBoard[i][j] = gameBoard[i][j];
-                //                 boolFlag = true;
-                //             }
-                //         }
-                //     }
-                //     if (boolFlag) {
-                //         setGameBoard(curBoard);
-                //     }
-                // }
                 const encodedPlayerName = encodeKey(playerName as string);
                 setScores(curRound.scores);
                 setIsOver(curRound.isRoundOver);
@@ -140,13 +120,7 @@ const GameTime: React.FC = () => {
         if (selectedCard == null || selectedCardId === -1) return;
         if (card.color !== Colors.Blank && card.color !== selectedCard.color) return;
         if (card.number + 1 !== selectedCard.number) return;
-
-        // selectedCard.positionX = card.positionX;
-        // selectedCard.positionY = card.positionY;
-        //const deckWithRemovedCard: Deck = removeCardFromPlayerHand(selectedCard) as Deck;
         if (gameRound < 0 ) return;
-
-        //await updateTransactGameStateWithTwoTransactsAndUpdateScore(playerName as string, selectedCard, card,path,parseInt(gameRound));
         await firebase.doCallCloudFunction('MAKE_PLAYER_MOVE', {playerName,cardToAddToBoard:selectedCard,positionOnBoard:card.position,pathToCurrentRound:path,keys, round: gameRound} )
         setSelectedCard(null);
         setSelectedCardId(-1);
@@ -169,25 +143,6 @@ const GameTime: React.FC = () => {
              setWoodPile([]);
         }
         setSelectedCardId(-1);
-    };
-
-     const removeCardFromPlayerHand = (card: CardProps) => {
-        if (postPile.includes(card) && blitzPile.length) {
-            const moveOver = blitzPile.pop();
-            postPile.push(moveOver as CardProps);
-        }
-        const curBlitzPile = blitzPile.filter(c => c !== card);
-        const curPostPile = postPile.filter(c => c !== card);
-        const curWoodPile = woodPile.filter(c => c !== card);
-        if (curBlitzPile.length === 0) {
-            setIsOver(true);
-        }
-        return {
-            blitzPile: curBlitzPile,
-            postPile: curPostPile,
-            woodPile: curWoodPile,
-            owner: playerName
-        };
     };
 
     const handleSelectCard = (card: CardProps) => {

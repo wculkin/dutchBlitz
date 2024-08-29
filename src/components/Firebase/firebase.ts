@@ -1,9 +1,8 @@
 import { initializeApp, FirebaseApp } from 'firebase/app';
 import { getAuth, Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, connectAuthEmulator } from 'firebase/auth';
-import { getFirestore, Firestore, connectFirestoreEmulator } from 'firebase/firestore';
-import {connectDatabaseEmulator, Database, getDatabase} from 'firebase/database';
+import { getFirestore, Firestore } from 'firebase/firestore';
+import { Database, getDatabase} from 'firebase/database';
 import {getFunctions, connectFunctionsEmulator, httpsCallable} from 'firebase/functions';
-import {handleOnCall} from "../../../functions/src";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -78,7 +77,3 @@ class Firebase {
 }
 
 export default Firebase;
-
-
-
-// Import the functions you need from the SDKs you need

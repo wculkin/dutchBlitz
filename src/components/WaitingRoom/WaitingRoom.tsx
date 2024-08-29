@@ -133,10 +133,6 @@ const WaitingRoom: React.FC = () => {
             <div className="wr-input-group">
                 <button onClick={handleAddComputerPlayer} className="wr-add-btn">Add computer player {numberComputers+1}</button>
             </div>)}
-
-
-
-
             <button className="wr-start-btn" onClick={handleStartGame}>Start Game</button>
         </div>
     );

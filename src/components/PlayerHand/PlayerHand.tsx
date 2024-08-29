@@ -17,7 +17,6 @@ type PlayerHandProps = {
 
 const PlayerHand: React.FC<PlayerHandProps> = ({blitzPile ,postPiles,woodPile,onSelectCard, selectedCardId, totalLength }) => {
   const [woodPileIndex, setWoodPileIndex] = useState(0);
-  const [lengthRemaining, setLengthRemaining] = useState(woodPile.length-1);
   const [highlightedIndex, setHighlightedIndex] = useState<{pile: string, index: number} | null>(null);
 
   const handleBlitzPileClick = () => {

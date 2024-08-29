@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {collection, getDocs, addDoc, doc, onSnapshot, query, limit, setDoc, where} from 'firebase/firestore';
+import {collection,onSnapshot, query, limit, where} from 'firebase/firestore';
 import Firebase from "../Firebase";
 import './Lobby.css'
 import {useNavigate} from "react-router-dom";
@@ -8,12 +8,9 @@ import { WaitingRoom } from '../../../functions/src/waitingRoomServices';
 
 const Lobby: React.FC = () => {
   const [waitingRooms, setWaitingRooms] = useState<WaitingRoom[]>([]);
-  const [newGameName, setNewGameName] = useState<string>('');
   const firebase = new Firebase();
   const db = firebase.db
   const navigate = useNavigate();
-  const WAITING_ROOMS = "waitingRoom"
-
   // Fetch games from Firestore
   useEffect(() => {
    // Create a reference to the 'waitingRooms' collection and query the first 25 documents
