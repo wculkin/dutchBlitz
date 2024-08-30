@@ -35,11 +35,11 @@ export class OnCallHandler {
     this.mapActionToFunction.set(MAKE_PLAYER_MOVE, (params:any) => this.makePlayerMove(params));
     this.mapActionToFunction.set(CREATE_USER, (params:any) => this.createUser(params));
   }
-  async handleEvent(eventType:string, params: any) {
+  async handleEvent(eventType:string, params: any) : Promise<any> {
     console.log(`EventType ${eventType} `);
     console.log(`params ${params} `);
 
-    this.mapActionToFunction.get(eventType)(params);
+    return this.mapActionToFunction.get(eventType)(params);
   }
 
   private async createWaitingRoom(params:any) {
@@ -60,6 +60,7 @@ export class OnCallHandler {
     } catch (error) {
       console.error("Error creating new game:", error);
     }
+    return {};
   }
   private async addPlayerToWaitingRoom(params:any) {
     const {playerToAdd, roomId} = params;
@@ -68,6 +69,7 @@ export class OnCallHandler {
       updatedAt: new Date(),
     };
     await this.firebase.updateFireStoreDoc("waitingRooms", roomId, updates);
+    return {};
   }
   private async deletePlayerFromWaitingRoom(params:any) {
     const {player, roomId} = params;
@@ -76,6 +78,7 @@ export class OnCallHandler {
       updatedAt: new Date(),
     };
     await this.firebase.updateFireStoreDoc("waitingRooms", roomId, updates);
+    return {};
   }
 
   private async handleStartRound(params:any) {
@@ -111,6 +114,7 @@ export class OnCallHandler {
       await this.firebase.updateFireStoreDoc("waitingRooms", roomId, updates);
       console.log(theNewRound);
     }
+    return {};
     // Should see if there is a current game
     // can either get the local data from player or call the db
     // then need to call the realtime to get info about gamestate like do we need to create a new round or not
@@ -155,6 +159,7 @@ export class OnCallHandler {
       await this.firebase.updateFireStoreDoc("waitingRooms", keys, data);
       await this.firebase.updateDocument(gameStatePath, finalUpdates);
     }
+    return {};
     // todo should right a function to check all arrays make sense
     // todo end game shit
   }
@@ -175,6 +180,7 @@ export class OnCallHandler {
       displayName: displayName,
     });
     const userData:User = {
+      id: userRecord.uid,
       displayName,
       email,
       finished: 0,
@@ -183,7 +189,12 @@ export class OnCallHandler {
       unfinished: 0,
       wonGames: 0,
     };
+    const returnData = {
+      userData: userData,
+      userRecord,
+    };
     await this.firebase.setFireStoreDoc("users", userRecord.uid, userData);
+    return returnData;
   }
   private async getCurrentRoundInformation(path: string) {
     // todo write this to double check we have the right round

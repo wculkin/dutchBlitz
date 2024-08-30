@@ -24,7 +24,7 @@ export const handleOnCall = onCall(async (event) => {
   console.log(`Event Type: ${eventType}`);
   console.log("Params: ", params);
 
-  await functionHandler.handleEvent(eventType, params);
-  return {success: true, message: "handledWaitingRoom"};
+  const returnData = await functionHandler.handleEvent(eventType, params);
+  return {success: true, message: "handledWaitingRoom", data: returnData};
 });
 
