@@ -13,8 +13,8 @@ export type WaitingRoomProps = {
 
 const WaitingRoomInitial: React.FC<WaitingRoomProps> = ({waitingRoom, onStartClicked}) => {
     const fireBase = useFirebase();
-    const { user } = useGlobalState();
-    const [playerName, setPlayerName] = useState(user!.email as string);
+    const { userData } = useGlobalState();
+    const [playerName, setPlayerName] = useState(userData?.displayName as string);
     const isPlayerInGame = () => {
         if(!waitingRoom) return false
         for (let val of waitingRoom.players){

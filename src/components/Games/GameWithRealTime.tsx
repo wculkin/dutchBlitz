@@ -17,6 +17,7 @@ const GameTime: React.FC = () => {
     const firebase = useFirebase();
     const db = getDatabase(firebase.app); // Use Realtime Database
     const { user } = useGlobalState();
+    const { userData } = useGlobalState();
     const { keys } = useParams<{ keys: string }>();
     const dataRef = ref(db, `gameStates/${keys}`);
     const [snapshot, loading, error] = useObject(dataRef);
@@ -30,7 +31,7 @@ const GameTime: React.FC = () => {
     const [gameBoard, setGameBoard] = useState<CardProps[][] >([]);
     const [isOver, setIsOver] = useState<boolean>(false);
     const [scores, setScores] = useState<{ [key: string]: PlayerScore } | null>(null);
-    const [playerName, setPlayerName] = useState(user!.email);
+    const [playerName, setPlayerName] = useState(userData!.displayName);
     const [blitzPile, setBlitzPile] = useState<CardProps[]>([]);
     const [postPile, setPostPile] = useState<CardProps[]>([]);
     const [woodPile, setWoodPile] = useState<CardProps[]>([]);
