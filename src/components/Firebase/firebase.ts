@@ -62,8 +62,8 @@ class Firebase {
     }
   };
 
-  doCreateUserWithEmailAndPassword = (email: string, password: string) => {
-    return createUserWithEmailAndPassword(this.auth, email, password);
+  doCreateUserWithEmailAndPassword = async (email: string, password: string) => {
+    return await this.doCallCloudFunction("CREATE_USER", {email, password})
   }
 
   doSignInWithEmailAndPassword = (email: string, password: string) => {

@@ -27,7 +27,7 @@ const SignInForm: React.FC = () => {
     try {
       await signIn(email, password);
       setState({ ...INITIAL_STATE });
-      navigate(ROUTES.HOME); // Redirect to home page
+      navigate(ROUTES.LANDING); // Redirect to home page
     } catch (error: any) {
       console.error('Error signing in:', error); // Log error to console
       setState(prevState => ({ ...prevState, error }));

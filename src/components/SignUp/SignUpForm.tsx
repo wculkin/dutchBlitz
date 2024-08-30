@@ -2,6 +2,7 @@ import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as ROUTES from '../../constants/routes';
 import { useFirebase } from '../Firebase/context';
+import {useAuth} from "../../useAuth";
 
 interface State {
   username: string;
@@ -23,21 +24,21 @@ const SignUpForm: React.FC = () => {
   const [state, setState] = useState<State>({ ...INITIAL_STATE });
   const navigate = useNavigate();
   const firebase = useFirebase();
+  const { signIn } = useAuth();
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
     const { email, passwordOne } = state;
 
     firebase
       .doCreateUserWithEmailAndPassword(email, passwordOne)
-      .then((authUser:any) => {
+      .then(async (returnData) => {
         setState({ ...INITIAL_STATE });
-        navigate(ROUTES.HOME); // Redirect to home page
+        await signIn(returnData.data.userData.email, passwordOne)
+        navigate(ROUTES.LANDING); // Redirect to home page
       })
       .catch((error:any) => {
         setState(prevState => ({ ...prevState, error }));
       });
-
-
   };
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {

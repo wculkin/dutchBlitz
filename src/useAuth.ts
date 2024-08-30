@@ -14,14 +14,19 @@ export const useAuth = () => {
         console.log('User logged in:', user); // Debug log
         dispatch({ type: 'SET_USER', payload: user });
       } else {
-        console.log('No user logged in'); // Debug log
-        dispatch({ type: 'CLEAR_USER' });
+         createRandomUser()
       }
       setLoading(false);
     });
 
     return () => unsubscribe();
   }, [firebase, dispatch]);
+
+  const createRandomUser = async () => {
+     if(!firebase){return}
+     const data = await firebase.doCreateUserWithEmailAndPassword("","")
+     await signIn(data.data.userData.email, "qqqqqq")
+  };
 
   const signIn = async (email: string, password: string) => {
      if(!firebase){return}
