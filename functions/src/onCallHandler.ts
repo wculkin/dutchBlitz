@@ -9,12 +9,15 @@ import {
   getNewRound,
   validateMoveIsValid,
 } from "./gameServices";
+import {User} from "./userInterface";
 
 export const ADD_PLAYER = "ADD_PLAYER";
 export const DELETE_PLAYER = "DELETE_PLAYER";
 export const START_ROUND = "START_ROUND";
 export const CREATE_WAITING_ROOM = "CREATE_WAITING_ROOM";
 export const MAKE_PLAYER_MOVE = "MAKE_PLAYER_MOVE";
+export const CREATE_USER = "CREATE_USER";
+
 export const IS_ROUND_OVER = "isRoundOver";
 
 
@@ -152,6 +155,30 @@ export class OnCallHandler {
     }
     // todo should right a function to check all arrays make sense
     // todo end game shit
+  }
+  private async createUser(params:any) {
+    let {email, password, displayName} = params;
+    if (!email || email == "") {
+      email = "s@gmail.com";
+      password = "qqqqqq";
+      displayName = "d";
+    }
+    const userRecord = await this.firebase.auth.createUser({
+      email: email,
+      password: password,
+      displayName: displayName,
+    });
+    const userData:User = {
+      displayName,
+      email,
+      finished: 0,
+      gamesIds: [],
+      rating: 0,
+      unfinished: 0,
+      wonGames: 0,
+
+    };
+    await this.firebase.updateFireStoreDoc("users", userRecord.uid, userData);
   }
   private async getCurrentRoundInformation(path: string) {
     // todo write this to double check we have the right round
