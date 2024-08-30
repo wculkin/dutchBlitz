@@ -10,6 +10,7 @@ import {
   validateMoveIsValid,
 } from "./gameServices";
 import {User} from "./userInterface";
+import {generateRandomUsername, getUniqueEmail} from "./nameGenerator";
 
 export const ADD_PLAYER = "ADD_PLAYER";
 export const DELETE_PLAYER = "DELETE_PLAYER";
@@ -32,6 +33,7 @@ export class OnCallHandler {
     this.mapActionToFunction.set(START_ROUND, (params:any) => this.handleStartRound(params));
     this.mapActionToFunction.set(CREATE_WAITING_ROOM, (params:any) => this.createWaitingRoom(params));
     this.mapActionToFunction.set(MAKE_PLAYER_MOVE, (params:any) => this.makePlayerMove(params));
+    this.mapActionToFunction.set(CREATE_USER, (params:any) => this.createUser(params));
   }
   async handleEvent(eventType:string, params: any) {
     console.log(`EventType ${eventType} `);
@@ -159,9 +161,13 @@ export class OnCallHandler {
   private async createUser(params:any) {
     let {email, password, displayName} = params;
     if (!email || email == "") {
-      email = "s@gmail.com";
+      email = getUniqueEmail();
+    }
+    if (!password || password == "") {
       password = "qqqqqq";
-      displayName = "d";
+    }
+    if (!displayName || displayName == "") {
+      displayName = generateRandomUsername();
     }
     const userRecord = await this.firebase.auth.createUser({
       email: email,
@@ -176,9 +182,8 @@ export class OnCallHandler {
       rating: 0,
       unfinished: 0,
       wonGames: 0,
-
     };
-    await this.firebase.updateFireStoreDoc("users", userRecord.uid, userData);
+    await this.firebase.setFireStoreDoc("users", userRecord.uid, userData);
   }
   private async getCurrentRoundInformation(path: string) {
     // todo write this to double check we have the right round

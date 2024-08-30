@@ -2,6 +2,7 @@ import * as admin from "firebase-admin";
 export class Firebase {
   db : admin.firestore.Firestore;
   realTime: admin.database.Database;
+  auth: admin.auth.Auth;
 
   constructor() {
     console.log("Firebase initialized...");
@@ -10,6 +11,7 @@ export class Firebase {
       this.db = admin.firestore();
       // Realtime Database instance
       this.realTime = admin.database();
+      this.auth = admin.auth();
     } catch (error) {
       console.error("Error initializing Firebase:", error);
       throw new Error("Failed to initialize Firebase");
