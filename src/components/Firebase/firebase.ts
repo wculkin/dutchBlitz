@@ -1,8 +1,9 @@
 import { initializeApp, FirebaseApp } from 'firebase/app';
-import { getAuth, Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, connectAuthEmulator } from 'firebase/auth';
-import { getFirestore, Firestore } from 'firebase/firestore';
+import { getAuth, Auth, signInWithEmailAndPassword, signOut, connectAuthEmulator } from 'firebase/auth';
+import {getFirestore, Firestore, getDoc, doc} from 'firebase/firestore';
 import { Database, getDatabase} from 'firebase/database';
 import {getFunctions, connectFunctionsEmulator, httpsCallable} from 'firebase/functions';
+import {UserData} from "../../sharedStuff/interfaces";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -72,6 +73,15 @@ class Firebase {
 
   doSignOut = () => {
     return signOut(this.auth);
+  }
+
+  getUser = async (id: string) => {
+    const userDoc = doc(this.db, `users/${id}`);
+
+    // Fetch all documents in the "users" collection
+    const userSnapshot = await getDoc(userDoc);
+
+    return userSnapshot.data() as UserData
   }
 
 }

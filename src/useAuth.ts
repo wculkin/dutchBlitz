@@ -9,10 +9,11 @@ export const useAuth = () => {
 
   useEffect(() => {
     if(!firebase){return}
-    const unsubscribe = firebase.auth.onAuthStateChanged((user) => {
+    const unsubscribe = firebase.auth.onAuthStateChanged(async (user) => {
       if (user) {
         console.log('User logged in:', user); // Debug log
-        dispatch({ type: 'SET_USER', payload: user });
+        const userData = await firebase.getUser(user.uid)
+        dispatch({ type: 'SET_USER', payload: user, userData: userData});
       } else {
          createRandomUser()
       }
@@ -32,7 +33,8 @@ export const useAuth = () => {
      if(!firebase){return}
     try {
       const userCredential = await firebase.doSignInWithEmailAndPassword(email, password);
-      dispatch({ type: 'SET_USER', payload: userCredential.user });
+      const userData = await firebase.getUser(userCredential.user.uid)
+      dispatch({ type: 'SET_USER', payload: userCredential.user, userData: userData });
     } catch (error) {
       console.error('Error signing in:', error);
       throw error; // Re-throw error to be handled by the caller

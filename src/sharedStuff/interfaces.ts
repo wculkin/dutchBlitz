@@ -100,3 +100,14 @@ export interface WaitingRoom {
   route?: string;
   scores?: { [key: string]: PlayerScore };
 }
+
+export type UserData = {
+    id: string
+    displayName: string
+    email: string
+    gamesIds: string[]
+    unfinished: number
+    finished: number
+    wonGames: number
+    rating: number
+}
