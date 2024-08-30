@@ -1,3 +1,5 @@
+import {v4 as uuidv4} from "uuid";
+
 const adjectivesAndVerbs: string[] = [
   "Swift", "Clever", "Brave", "Fierce", "Mighty", "Silent", "Thunderous", "Gliding",
   "Running", "Soaring", "Dashing", "Stealthy", "Roaring", "Sly", "Blazing",
@@ -20,6 +22,12 @@ export function generateRandomUsername(): string {
   const adjectiveOrVerb = adjectivesAndVerbs[getRandomInt(0, adjectivesAndVerbs.length - 1)];
   const animal = animals[getRandomInt(0, animals.length - 1)];
   return `${adjectiveOrVerb} ${animal}`;
+}
+
+export function getUniqueEmail(): string {
+  const endingEmail = "@gmail.com";
+  const uuid = uuidv4();
+  return uuid + endingEmail;
 }
 
 function getRandomInt(min: number, max: number): number {
