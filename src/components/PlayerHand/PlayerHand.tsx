@@ -8,40 +8,40 @@ type PlayerHandProps = {
   blitzPile:CardProps[];
   postPiles:CardProps[];
   woodPile:CardProps[];
-  onSelectCard: (card: CardProps) => void;
-  selectedCardId:  number;
+  onSelectCard: (card: CardProps, isHighlighted: boolean) => void;
   totalLength: number
 };
 
 
 
-const PlayerHand: React.FC<PlayerHandProps> = ({blitzPile ,postPiles,woodPile,onSelectCard, selectedCardId, totalLength }) => {
+const PlayerHand: React.FC<PlayerHandProps> = ({blitzPile ,postPiles,woodPile,onSelectCard, totalLength }) => {
   const [woodPileIndex, setWoodPileIndex] = useState(0);
-  const [highlightedIndex, setHighlightedIndex] = useState<{pile: string, index: number} | null>(null);
+  const [highlightedIndex, setHighlightedIndex] = useState<{pile: string, index: number} >({pile:"none", index:-1});
 
   const handleBlitzPileClick = () => {
       if(blitzPile.length === 0) return
     const card = blitzPile[blitzPile.length - 1];
     setHighlightedIndex({pile: 'blitz', index: 0});
-    onSelectCard(card);
+    onSelectCard(card, true);
   };
 
   const handlePostPilesClick = (index: number) => {
       if(postPiles.length < index) return
     const card = postPiles[index];
     setHighlightedIndex({pile: 'post', index});
-    onSelectCard(card);
+    onSelectCard(card,true);
   };
 
   const handleWoodPileClick = () => {
       if(woodPile.length < woodPileIndex) return
     const card = woodPile[woodPileIndex];
     setHighlightedIndex({pile: 'wood', index: woodPileIndex});
-    onSelectCard(card);
+    onSelectCard(card,true);
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
     if (event.key === ' ') {
+         onSelectCard(woodPile[woodPileIndex], false);
             setWoodPileIndex((prevIndex) => {
                 let nextIndex = prevIndex + 1;
                 if (nextIndex > totalLength){
@@ -49,6 +49,8 @@ const PlayerHand: React.FC<PlayerHandProps> = ({blitzPile ,postPiles,woodPile,on
                 }
                 return nextIndex;
             });
+            setHighlightedIndex({pile:"none", index:-1});
+
     }
   };
 
@@ -58,7 +60,7 @@ const PlayerHand: React.FC<PlayerHandProps> = ({blitzPile ,postPiles,woodPile,on
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [woodPile]);
+  }, [woodPile, highlightedIndex, ]);
 
   return (
     <div className="player-hand">
@@ -68,7 +70,6 @@ const PlayerHand: React.FC<PlayerHandProps> = ({blitzPile ,postPiles,woodPile,on
           {blitzPile.length > 0 && (
               <Card
                   {...blitzPile[blitzPile.length - 1]} // Only display the top card
-                  highlighted={highlightedIndex?.pile === 'blitz' && highlightedIndex.index === 0 && selectedCardId != -1}
                   onClick={handleBlitzPileClick}
               />
           )}
@@ -81,7 +82,6 @@ const PlayerHand: React.FC<PlayerHandProps> = ({blitzPile ,postPiles,woodPile,on
               <Card
                   key={index}
                   {...card}
-                  highlighted={highlightedIndex?.pile === 'post' && highlightedIndex.index === index && selectedCardId != -1}
                   onClick={() => handlePostPilesClick(index)}
               />
           ))}
@@ -93,7 +93,6 @@ const PlayerHand: React.FC<PlayerHandProps> = ({blitzPile ,postPiles,woodPile,on
           {woodPile.length > 0 && (
               <Card
                   {...woodPile[woodPileIndex]} // Display the card at the current index
-                  highlighted={highlightedIndex?.pile === 'wood' && highlightedIndex.index === woodPileIndex && selectedCardId != -1}
                   onClick={handleWoodPileClick}
               />
           )}

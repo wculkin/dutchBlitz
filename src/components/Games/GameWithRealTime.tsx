@@ -31,11 +31,10 @@ const GameTime: React.FC = () => {
     const [gameBoard, setGameBoard] = useState<CardProps[][] >([]);
     const [isOver, setIsOver] = useState<boolean>(false);
     const [scores, setScores] = useState<{ [key: string]: PlayerScore } | null>(null);
-    const [playerName, setPlayerName] = useState(userData!.displayName);
+    const playerName = userData!.displayName;
     const [blitzPile, setBlitzPile] = useState<CardProps[]>([]);
     const [postPile, setPostPile] = useState<CardProps[]>([]);
     const [woodPile, setWoodPile] = useState<CardProps[]>([]);
-    const [selectedCardId, setSelectedCardId] = useState(-1);
     const [selectedCard, setSelectedCard] = useState<CardProps | null>(null);
     const [path, setPath] = useState("")
     const [gameRound, setGameRound]  = useState(-1);
@@ -118,13 +117,13 @@ const GameTime: React.FC = () => {
         console.log("card from hand ", selectedCard)
         console.log("gameRound ", gameRound)
 
-        if (selectedCard == null || selectedCardId === -1) return;
+        if (selectedCard == null) return;
         if (card.color !== Colors.Blank && card.color !== selectedCard.color) return;
         if (card.number + 1 !== selectedCard.number) return;
         if (gameRound < 0 ) return;
+        handleSelectCard(selectedCard,false)
         await firebase.doCallCloudFunction('MAKE_PLAYER_MOVE', {playerName,cardToAddToBoard:selectedCard,positionOnBoard:card.position,pathToCurrentRound:path,keys, round: gameRound} )
-        setSelectedCard(null);
-        setSelectedCardId(-1);
+
     };
 
     const setPlayerHand = (deck: Deck) => {
@@ -143,12 +142,17 @@ const GameTime: React.FC = () => {
         }else{
              setWoodPile([]);
         }
-        setSelectedCardId(-1);
     };
 
-    const handleSelectCard = (card: CardProps) => {
-        setSelectedCard(card);
-        setSelectedCardId(0);
+    const handleSelectCard = (card: CardProps, isHighlighted: boolean) => {
+        if(!card) return
+        if(isHighlighted){
+            card.highlighted = true
+            setSelectedCard(card);
+        }else{
+            card.highlighted = false
+            setSelectedCard(null);
+        }
     };
 
 
@@ -208,18 +212,18 @@ const GameTime: React.FC = () => {
 
         if(event.key ==='h'){
             if(blitzPile.length ===0) return
-            handleSelectCard(blitzPile[blitzPile.length-1])
+            handleSelectCard(blitzPile[blitzPile.length-1],true)
         }else if(event.key ==='j'){
             if(postPile.length ===0) return
-            handleSelectCard(postPile[0])
+            handleSelectCard(postPile[0],true)
         }
         else if(event.key ==='k'){
             if(postPile.length < 2) return
-            handleSelectCard(postPile[1])
+            handleSelectCard(postPile[1],true)
         }
         else if(event.key ==='l'){
             if(postPile.length < 3) return
-            handleSelectCard(postPile[2])
+            handleSelectCard(postPile[2],true)
         }
         else if(event.key ===';'){
             //this is tech debt for now. I don't have a super easy way to get the current woodsIndex will fix eventually
@@ -231,7 +235,7 @@ const GameTime: React.FC = () => {
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
-        }, [blitzPile,postPile,woodPile,selectedCard,selectedCardId]);
+        }, [blitzPile,postPile,woodPile,selectedCard]);
 
 
 
@@ -254,7 +258,6 @@ const GameTime: React.FC = () => {
                         postPiles={postPile}
                         woodPile={woodPile}
                         onSelectCard={handleSelectCard}
-                        selectedCardId={selectedCardId}
                         totalLength={woodPile.length - 1}
                     />
                 </>
