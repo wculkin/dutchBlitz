@@ -10,6 +10,7 @@ import { useFirebase } from "../Firebase/context";
 import {getDatabase, ref, onValue} from 'firebase/database';
 import {useObject} from "react-firebase-hooks/database";
 import {CardProps, Colors, Deck, encodeKey, GameRound, GameState} from "../../sharedStuff/interfaces";
+import AlertMessage from "../AlertMessage";
 
 
 const GameTime: React.FC = () => {
@@ -20,14 +21,15 @@ const GameTime: React.FC = () => {
     const { userData } = useGlobalState();
     const { keys } = useParams<{ keys: string }>();
     const dataRef = ref(db, `gameStates/${keys}`);
+    const [message, setMessage] = useState("");
+    const [visible, setVisible] = useState(false);
+    let [curTimer, setCurTimer] = useState<any>(null);
+
     const [snapshot, loading, error] = useObject(dataRef);
-
-
     if (!user) {
         alert("You need to sign in");
         navigate(ROUTES.SIGN_IN);
     }
-
     const [gameBoard, setGameBoard] = useState<CardProps[][] >([]);
     const [isOver, setIsOver] = useState<boolean>(false);
     const [scores, setScores] = useState<{ [key: string]: PlayerScore } | null>(null);
@@ -49,6 +51,19 @@ const GameTime: React.FC = () => {
             }
         }
     }
+
+    const handleVisibleMessage = (message: string) => {
+        clearTimeout(curTimer);
+        setVisible(true);
+        setMessage(message);
+        const timer = setTimeout(() => {
+            console.log("timer: ", timer)
+            console.log("curTimer: ", curTimer)
+            setVisible(false);
+            }, 2000)
+        setCurTimer(timer)
+    }
+
     useEffect(() => {
         if (!keys) return;
         if(gameRound === -1) return;
@@ -92,6 +107,7 @@ const GameTime: React.FC = () => {
                 setIsOver(curRound.isRoundOver);
                 const deck = curRound.decks[encodedPlayerName];
                 if (isDeckDifferent(deck)) {
+                    handleVisibleMessage("You just played a card!")
                     setPlayerHand(deck)
                 }
             }
@@ -117,11 +133,20 @@ const GameTime: React.FC = () => {
         console.log("card from hand ", selectedCard)
         console.log("gameRound ", gameRound)
 
-        if (selectedCard == null) return;
-        if (card.color !== Colors.Blank && card.color !== selectedCard.color) return;
-        if (card.number + 1 !== selectedCard.number) return;
-        if (gameRound < 0 ) return;
+        if (selectedCard == null) {
+            handleVisibleMessage("You need to select a card first")
+            return;
+        }
+        if (card.color !== Colors.Blank && card.color !== selectedCard.color) {
+            handleVisibleMessage("You tried to play the wrong color")
+            return;
+        }
+        if (card.number + 1 !== selectedCard.number){
+            handleVisibleMessage(card.owner! + " played the " + card.color + " " + card.number)
+            return;
+        }
         handleSelectCard(selectedCard,false)
+        if (gameRound < 0 ) return;
         await firebase.doCallCloudFunction('MAKE_PLAYER_MOVE', {playerName,cardToAddToBoard:selectedCard,positionOnBoard:card.position,pathToCurrentRound:path,keys, round: gameRound} )
 
     };
@@ -147,8 +172,11 @@ const GameTime: React.FC = () => {
     const handleSelectCard = (card: CardProps, isHighlighted: boolean) => {
         if(!card) return
         if(isHighlighted){
-            card.highlighted = true
+            if(selectedCard){
+                selectedCard.highlighted = false
+            }
             setSelectedCard(card);
+            card.highlighted = true
         }else{
             card.highlighted = false
             setSelectedCard(null);
@@ -248,6 +276,9 @@ const GameTime: React.FC = () => {
                     <Scores playerScores={scores} />
                 </>
             )}
+            <>
+                {visible && <AlertMessage message={message}/>}
+            </>
             <GameBoard rows={gameBoard} onCardClicked={handleCardClickOnGameBoard} />
             {isOver ? (
                 <div className="game-over-message">Game is over</div>
